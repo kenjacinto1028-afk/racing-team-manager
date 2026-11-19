@@ -4,6 +4,12 @@ Record every design or technical decision here, newest first, so future sessions
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-11-19 | Owner approved Phases 10-16. Always use the model that spends the fewest tokens for each step | Owner's choice |
+| 2026-11-19 | Once Phase 16 is built, new games start in tier 5 (Formula Rookie); existing saves keep their tier | Longer climb to the top |
+| 2026-11-19 | Phase 16: expand to a 5-tier ladder (new Formula Regional and Formula Rookie below Academy) and add side championships for tiers 3-5 only. Replaces the 3-tier rule once built | Owner's choice: a longer climb plus extra events for junior teams |
+| 2026-11-19 | v2 build order: Foundations, Economy, Cars/parts, Development, Careers, Records, More leagues (`docs/ROADMAP.md`) | Careers and records need a history archive; new leagues touch everything, so they go last |
+| 2026-11-19 | Model split: Opus for engine/balance, Sonnet for screens, Haiku for data/content | Saves tokens |
+| 2026-11-19 | New car parts feed the existing 4 car ratings rather than replacing them | Keeps the race sim and its tests working |
 | 2026-11-19 | Hosted on GitHub Pages, deployed by GitHub Actions on every push to `main` | Free, public play link that updates itself |
 | 2026-11-19 | Tooltips open on hover or keyboard focus only (not mouse click) | Stops tooltips sticking open on buttons |
 | 2026-11-19 | Below 1200 px wide, wide tables scroll inside their card | Keeps the page itself from scrolling sideways at 1024 px |

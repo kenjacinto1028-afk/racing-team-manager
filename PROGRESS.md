@@ -1,6 +1,6 @@
 # Progress
 
-**Current phase:** v1 complete + tutorial added. Next: playtest, then pick items from "Later" in PLAN.md
+**Current phase:** v1 complete. v2 roadmap written (`docs/ROADMAP.md`). Next: Phase 10 Foundations
 **Last updated:** 2026-11-19
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
@@ -72,6 +72,57 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 ## Phase 9: Tutorial and tooltip gaps ✅
 - [x] 10-step guided tour (skippable, replay from sidebar, Esc / arrow keys)
 - [x] Tooltips: race controls (pause, speed, skip, driver mode, commentary, tyre cliff), Pos and Age headings, sidebar hints
+
+## v2 roadmap (details in `docs/ROADMAP.md`)
+
+## Phase 10: Foundations (Opus)
+- [ ] History archive saved at each season end
+- [ ] Migrate old saves instead of resetting them
+- [ ] Week numbers on the calendar
+
+## Phase 11: Economy and finances (Opus engine, Sonnet screens, Haiku data)
+- [ ] Sponsor deals with goals (title sponsor + 2-3 smaller)
+- [ ] Pay drivers (bring their own money)
+- [ ] Contract talks: salary, length, win/podium bonuses, counter-offers
+- [ ] Firing with settlement and morale hit
+- [ ] Scout staff role (reveals true potential)
+- [ ] Finance screen: breakdown, forecast, balance chart
+- [ ] Optional budget cap in Prime
+
+## Phase 12: Cars, parts and setup (Opus engine, Sonnet screens, Haiku data)
+- [ ] Car concepts with pros and cons (low-drag, high-downforce, balanced, tyre-friendly)
+- [ ] Parts with trade-offs feeding the 4 car ratings
+- [ ] Weekend setup (wing level, suspension)
+- [ ] Part wear and grid penalties
+- [ ] R&D projects that take several races
+- [ ] Balance check over 100+ races
+
+## Phase 13: Driver and staff development (Opus engine, Sonnet screens, Haiku data)
+- [ ] Training plans and race experience
+- [ ] Driver traits
+- [ ] Morale
+- [ ] Youth academy
+- [ ] Staff growth and courses
+- [ ] Facilities (factory, simulator, gym)
+
+## Phase 14: Career pages and trophies (Sonnet)
+- [ ] Driver and staff profile pages with season-by-season history
+- [ ] Trophy cabinet and personal records
+- [ ] Team history page
+- [ ] Click any name to open its profile
+
+## Phase 15: World records and feats (Sonnet, Haiku data)
+- [ ] Record book (all leagues, all seasons)
+- [ ] Track records
+- [ ] Player feats and badge wall
+- [ ] Record-broken alerts
+
+## Phase 16: More leagues (Opus engine, Sonnet screens, Haiku data)
+- [x] Decide: 5-tier ladder + side championships for tiers 3-5
+- [x] Decide: new games start in tier 5 (Formula Rookie)
+- [ ] Add Formula Regional (tier 4) and Formula Rookie (tier 5)
+- [ ] Side championships: Endurance Cup, Winter Series, Street Invitational
+- [ ] League screens, new tracks and teams
 
 ---
 

@@ -4,6 +4,11 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-19: v2 roadmap
+- Wrote `docs/ROADMAP.md`: 7 phases (10-16) covering economy, cars and parts, development, careers, records and more leagues, with model picks per phase. Added them to `PROGRESS.md`.
+- Phase 16 decided: 5 tiers plus side championships for tiers 3-5. New games will start in tier 5. Still open: migrating saves instead of resetting (Phase 10).
+- **Next:** Phase 10 Foundations with Opus.
+
 ## 2026-11-19: Tutorial and tooltip gaps
 - Added a 10-step guided tour (`src/ui/components/Tutorial.tsx`, steps in `src/data/tutorial.ts`). Shows on first launch, can be skipped, replayed with "Replay tutorial" in the sidebar. "Seen" flag lives in its own localStorage key, so the save shape and `saveVersion` are unchanged.
 - Filled tooltip gaps: race controls, commentary, tyre cliff, Pos/Age headings, sidebar hover hints; 7 new glossary entries.
