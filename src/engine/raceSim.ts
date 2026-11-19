@@ -182,12 +182,12 @@ export function stepLap(race: RaceState, orders: Orders = {}): RaceState {
     const fuel = 1.8 * ((race.totalLaps - race.lap) / race.totalLaps);
     let t = baseLap(car.c, track) + car.form + COMPOUND_OFFSET[car.tyre.compound] + tyrePenalty(car.tyre.wear) + fuel +
       MODE_DELTA[car.mode] + rng.normal(0, lapSpread(car.c));
-    if (rng.chance(0.012 * (1.6 - car.c.consistency / 100))) {
+    if (rng.chance(0.012 * (1.6 - car.c.consistency / 100) * (car.c.mistakeMult ?? 1))) {
       const loss = rng.float(1, 4);
       t += loss;
       events.push({ lap: lapNo, type: 'mistake', text: `${car.c.name} runs wide and loses ${loss.toFixed(1)}s.`, driverIds: [car.c.driverId] });
     }
-    if (lapNo === 1) t += rng.normal(0, 0.6); // chaotic first lap
+    if (lapNo === 1) t += rng.normal(0, 0.6) + (car.c.startDelta ?? 0); // chaotic first lap
 
     car.tyre.wear = car.tyre.wear + wearPerLap(car.c, car.tyre.compound, car.mode, track);
     car.tyre.age += 1;

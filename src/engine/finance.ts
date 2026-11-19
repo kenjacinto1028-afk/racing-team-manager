@@ -154,6 +154,12 @@ export function upgradeCost(tier: TierId, timesUpgraded: number, tdRating: numbe
   return Math.round((LEAGUES[tier].upgradeBaseCost * Math.pow(1.35, timesUpgraded) * tdFactor) / 1000) * 1000;
 }
 
+/** Upgrade price for a team, after the factory discount (6% per level). */
+export function teamUpgradeCost(team: Team, stat: CarStat, tdRating: number): number {
+  const factory = 1 - 0.06 * (team.facilities?.factory ?? 0);
+  return Math.round((upgradeCost(team.tier, team.upgrades[stat], tdRating) * factory) / 1000) * 1000;
+}
+
 /** Rating points gained from one upgrade. Harder to improve an already-great car. */
 export function upgradeGain(current: number, tdRating: number): number {
   return Math.max(1, Math.round((2 + tdRating / 35) * (1 - current / 115)));
@@ -166,7 +172,7 @@ export function buyUpgrade(state: GameState, teamId: string, stat: CarStat): Upg
   if (!team) return { ok: false, reason: 'Unknown team' };
   if (team.car[stat] >= 99) return { ok: false, reason: 'Already at maximum' };
   const td = techDirectorRating(state, team);
-  const cost = upgradeCost(team.tier, team.upgrades[stat], td);
+  const cost = teamUpgradeCost(team, stat, td);
   if (team.budget < cost) return { ok: false, reason: 'Not enough money' };
   const capped = capBlocks(state, team, cost);
   if (capped) return { ok: false, reason: capped };

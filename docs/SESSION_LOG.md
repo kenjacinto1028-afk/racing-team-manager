@@ -4,6 +4,16 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-19: Phase 13 Driver and staff development
+- Training: pick a focus per driver (pace, racecraft, tyres, fitness, balanced). Each race a chance of +1, faster when young, slower near potential. Race experience grows too.
+- Traits (8): tyre whisperer, strong starter, hot-headed, qualifying ace, street specialist, calm, mechanical sympathy, fast learner. ~30% of drivers start with one; more come after good seasons.
+- Driver morale: points, beating the team-mate, DNFs and low pay move it; worth up to ±0.1 s/lap; below 35 they won't renew.
+- Youth academy: 6 teenagers each season, sign up to 3, they train every race, promote from 17, leave at 19.
+- Staff improve slowly under 50 and fade after 60; courses give +2 to +4 once per season.
+- Facilities: factory (cheaper R&D), simulator (faster training), gym (fewer crashes); 5 levels, 3 races to build each.
+- Development screen added. Save v5. 99 tests pass; browser checks on an old save and a new game, no console errors.
+- **Next:** Phase 14 Career pages and trophies.
+
 ## 2026-11-19: Phase 12 Cars, parts and setup
 - Car concept per season (balanced, low-drag, high-downforce, tyre-friendly): worth up to ~0.2 s/lap depending on the track; locked after round 1. AI picks one each winter.
 - Parts: 7 slots, 14 alternative parts with trade-offs on the 4 ratings. Design them as R&D projects (cost up front, 1-4 races, 2 at a time, TD 70+ is a race quicker), then fit for free. AI sometimes designs one over the winter.

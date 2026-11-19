@@ -9,7 +9,8 @@ import { previewReview, renewContract as engineRenew, runOffseason, syncOtherLea
 import { applyOrder, raceToResult, simulateToEnd, stepLap, type RaceState } from '../engine/raceSim';
 import { completeRace, prepareWeekend, startRace as engineStartRace, type Weekend } from '../engine/raceSetup';
 import { isLeagueComplete } from '../engine/season';
-import type { CarConcept, CarSetup, CarStat, Compound, DriverMode, GameState, RaceResult, TierId, UnitKind } from '../engine/types';
+import { buildFacility as engineBuild, promoteYouth as enginePromote, releaseYouth as engineReleaseYouth, sendOnCourse as engineCourse, setTraining as engineSetTraining, signYouth as engineSignYouth } from '../engine/development';
+import type { FacilityKind, TrainingFocus, CarConcept, CarSetup, CarStat, Compound, DriverMode, GameState, RaceResult, TierId, UnitKind } from '../engine/types';
 
 import { migrateSave, SAVE_VERSION } from './migrations';
 
@@ -54,6 +55,12 @@ export interface GameStore extends Data {
   fitPart: (partId: string) => ActionResult;
   replaceUnit: (kind: UnitKind) => ActionResult;
   setSetup: (setup: CarSetup) => void;
+  setTraining: (driverId: string, focus: TrainingFocus) => void;
+  sendOnCourse: (staffId: string) => ActionResult;
+  buildFacility: (kind: FacilityKind) => ActionResult;
+  signYouth: (driverId: string) => ActionResult;
+  promoteYouth: (driverId: string) => ActionResult;
+  releaseYouth: (driverId: string) => ActionResult;
   buyUpgrade: (stat: CarStat) => ActionResult;
   /** Run qualifying for the player's next race. */
   prepareRace: () => ActionResult;
@@ -140,6 +147,15 @@ export function createGameStore(storage?: StateStorage, name = 'rtm-save') {
             const g = get().game;
             if (g && !get().weekend) set({ game: { ...g, setup } });
           },
+          setTraining: (id, focus) => {
+            const g = get().game;
+            if (g) set({ game: engineSetTraining(g, id, focus) });
+          },
+          sendOnCourse: (id) => withGame((g) => engineCourse(g, id)),
+          buildFacility: (kind) => withGame((g) => engineBuild(g, kind)),
+          signYouth: (id) => withGame((g) => engineSignYouth(g, id)),
+          promoteYouth: (id) => withGame((g) => enginePromote(g, id)),
+          releaseYouth: (id) => withGame((g) => engineReleaseYouth(g, id)),
           setBudgetCap: (on) => {
             const g = get().game;
             if (g) set({ game: { ...g, settings: { ...g.settings, budgetCap: on } } });

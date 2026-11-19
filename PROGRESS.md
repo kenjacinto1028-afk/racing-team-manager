@@ -1,6 +1,6 @@
 # Progress
 
-**Current phase:** Phase 12 Cars, parts and setup done. Next: Phase 13 Driver and staff development
+**Current phase:** Phase 13 Driver and staff development done. Next: Phase 14 Career pages and trophies
 **Last updated:** 2026-11-19
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
@@ -97,13 +97,14 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 - [x] R&D projects that take several races (2 at a time)
 - [x] Balance check over 120 races (`car.test.ts`)
 
-## Phase 13: Driver and staff development (Opus engine, Sonnet screens, Haiku data)
-- [ ] Training plans and race experience
-- [ ] Driver traits
-- [ ] Morale
-- [ ] Youth academy
-- [ ] Staff growth and courses
-- [ ] Facilities (factory, simulator, gym)
+## Phase 13: Driver and staff development ✅
+- [x] Training focus per driver and race experience (`engine/development.ts`)
+- [x] Driver traits (8, in `data/traits.ts`)
+- [x] Driver morale (unhappy drivers won't renew)
+- [x] Youth academy (3 places, promote at 17, leave at 19)
+- [x] Staff growth and courses
+- [x] Facilities (factory, simulator, gym; 5 levels each)
+- [x] New Development screen (Training, Youth academy, Facilities)
 
 ## Phase 14: Career pages and trophies (Sonnet)
 - [ ] Driver and staff profile pages with season-by-season history

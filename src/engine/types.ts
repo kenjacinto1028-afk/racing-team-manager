@@ -36,7 +36,16 @@ export interface Driver {
   retired?: boolean;
   /** Pay driver: brings this much sponsor money per race instead of asking for a salary. */
   payBudget?: number;
+  /** 20-95 (70 = normal). Results, pay and team-mate battles move it. */
+  morale: number;
+  traits: string[];
+  training: TrainingFocus;
+  /** Youth academy team (not racing yet). */
+  academyTeamId?: string | null;
 }
+
+export type TrainingFocus = 'pace' | 'racecraft' | 'tyres' | 'fitness' | 'balanced';
+export type FacilityKind = 'factory' | 'simulator' | 'gym';
 
 export interface Staff {
   id: string;
@@ -46,6 +55,8 @@ export interface Staff {
   age: number;
   contract: Contract | null;
   teamId: string | null;
+  /** Season of the last training course (one per season). */
+  courseSeason?: number;
 }
 
 export type CarStats = Record<CarStat, number>;
@@ -88,6 +99,12 @@ export interface Team {
   units: Record<UnitKind, UnitUse>;
   /** Grid places lost at the next race. */
   gridPenalty: number;
+  /** Facility levels 0-5. */
+  facilities: Record<FacilityKind, number>;
+  /** Facility upgrade under construction. */
+  building: { kind: FacilityKind; racesLeft: number } | null;
+  /** Youth academy driver ids (max 3). */
+  academy: string[];
 }
 
 export interface TrackProfile {
@@ -256,4 +273,6 @@ export interface GameState {
   settings: Settings;
   /** The player's car setup for the next race. */
   setup: CarSetup;
+  /** Teenagers available to sign to the youth academy this season. */
+  youthPool: string[];
 }

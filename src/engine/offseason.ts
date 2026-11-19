@@ -4,6 +4,7 @@ import { createRng, hashSeed, type Rng } from './rng';
 import { applyPrizeMoney, askingSalary, capBlocks, upgradeCost, upgradeGain, techDirectorRating } from './finance';
 import { calendarWeeks, createGenCtx, driverOverall, generateDriver, generateMarketDriver, generateStaff, makeCalendar, STAFF_ROLES } from './generate';
 import { carNewSeason } from './car';
+import { developOffseason, UNHAPPY } from './development';
 import { refreshOffers, settleSponsors, type SponsorSeasonResult } from './sponsors';
 import { addToHistory } from './history';
 import { autoRaceNext } from './raceSetup';
@@ -90,6 +91,7 @@ export function renewContract(state: GameState, kind: 'driver' | 'staff', id: st
   if (kind === 'driver') {
     const d = state.drivers[id];
     if (!d?.contract) return state;
+    if ((d.morale ?? 70) < UNHAPPY) return state; // unhappy drivers won't re-sign
     return { ...state, drivers: { ...state.drivers, [id]: { ...d, contract: { salary, yearsLeft: d.contract.yearsLeft + years } } } };
   }
   const s = state.staff[id];
@@ -251,6 +253,8 @@ export function runOffseason(input: GameState): { state: GameState; review: Seas
     year: s.year + 1,
     nextId: ctx.counter(),
   };
+  // Traits, morale reset, academy graduates, new youth pool (uses nextId, so it runs last).
+  s = developOffseason(s, rng);
   s = refreshOffers(s, rng);
   return { state: s, review };
 }

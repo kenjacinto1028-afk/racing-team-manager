@@ -9,6 +9,7 @@ import { recordResult } from './season';
 import type { GameState, StaffRole, Team, TierId, Track } from './types';
 import { afterRace, aiSetup, applyGridPenalties, conceptDelta, conceptWear, effectiveCar, setupDelta, wearRisk } from './car';
 import { createRng } from './rng';
+import { developAfterRace, gymCrashMult, moraleDelta, traitEffects } from './development';
 
 function staffRating(state: GameState, team: Team, role: StaffRole): number {
   const id = team.staffIds[role];
@@ -29,6 +30,7 @@ export function teamCompetitors(state: GameState, teamId: string, track?: Track,
   }
   return team.driverIds.map((id) => {
     const d = state.drivers[id];
+    const tr = traitEffects(d.traits ?? [], track?.id);
     return {
       driverId: d.id, teamId, name: d.lastName,
       pace: d.pace, consistency: d.consistency, racecraft: d.racecraft, tyreManagement: d.tyreManagement, experience: d.experience,
@@ -37,9 +39,13 @@ export function teamCompetitors(state: GameState, teamId: string, track?: Track,
       mechanic: staffRating(state, team, 'chiefMechanic'),
       pitCrew: staffRating(state, team, 'pitCrewChief'),
       morale: team.morale ?? 70,
-      lapDelta,
-      tyreWearMult: conceptWear(team.concept ?? 'balanced'),
-      mechRisk: team.units ? wearRisk(team) : 1,
+      lapDelta: lapDelta + (tr.lapDelta ?? 0) + moraleDelta(d.morale ?? 70),
+      tyreWearMult: conceptWear(team.concept ?? 'balanced') * (tr.tyreWearMult ?? 1),
+      mechRisk: (team.units ? wearRisk(team) : 1) * (tr.mechRisk ?? 1),
+      crashMult: (tr.crashMult ?? 1) * gymCrashMult(team),
+      mistakeMult: tr.mistakeMult,
+      startDelta: tr.startDelta,
+      qualiDelta: tr.qualiDelta,
     };
   });
 }
@@ -87,7 +93,8 @@ export function startRace(w: Weekend, trackId: string, opts: { playerDriverIds?:
 
 /** Record a finished race: result, points and money. */
 export function completeRace(state: GameState, tier: TierId, race: RaceState, round: number): GameState {
-  return afterRace(applyRaceFinances(recordResult(state, tier, raceToResult(race, round)), tier), tier);
+  const result = raceToResult(race, round);
+  return developAfterRace(afterRace(applyRaceFinances(recordResult(state, tier, result), tier), tier), tier, result);
 }
 
 /** Simulate a tier's next race entirely with AI (used for the leagues the player is not in). */

@@ -95,10 +95,10 @@ export function setPlayerSetup(state: GameState, setup: CarSetup): GameState {
 // ---- Parts and R&D projects ----
 
 /** Cost of designing a part for this team. A better Technical Director makes it cheaper. */
-export function projectCost(tier: TierId, partId: string, td: number): number {
+export function projectCost(tier: TierId, partId: string, td: number, factoryLevel = 0): number {
   const p = PART_BY_ID[partId];
   const tdFactor = 1.15 - td / 200;
-  return Math.round((LEAGUES[tier].upgradeBaseCost * p.cost * tdFactor) / 1000) * 1000;
+  return Math.round((LEAGUES[tier].upgradeBaseCost * p.cost * tdFactor * (1 - 0.06 * factoryLevel)) / 1000) * 1000;
 }
 
 /** Races a design takes. TD 70+ saves a race (never below 1). */
@@ -125,7 +125,7 @@ export function startProject(state: GameState, teamId: string, partId: string): 
   if (team.projects.some((p) => p.partId === partId)) return { ok: false, reason: 'Already in development' };
   if (team.projects.length >= MAX_PROJECTS) return { ok: false, reason: `The factory can run ${MAX_PROJECTS} projects at once` };
   const td = tdOf(state, team);
-  const cost = projectCost(team.tier, partId, td);
+  const cost = projectCost(team.tier, partId, td, team.facilities?.factory ?? 0);
   if (team.budget < cost) return { ok: false, reason: 'Not enough money' };
   if (state.settings?.budgetCap && team.tier === 1 && team.spend + cost > 15_000_000) return { ok: false, reason: 'That would break the budget cap' };
   const next: Team = { ...team, budget: team.budget - cost, spend: team.spend + cost, projects: [...team.projects, { partId, racesLeft: projectRaces(partId, td) }] };

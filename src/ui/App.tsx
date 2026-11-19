@@ -10,6 +10,7 @@ import { NavProvider, SCREENS, useNav, type ScreenId } from './nav';
 import { Car } from './screens/Car';
 import { Dashboard } from './screens/Dashboard';
 import { Drivers } from './screens/Drivers';
+import { Development } from './screens/Development';
 import { Finance } from './screens/Finance';
 import { Glossary } from './screens/Glossary';
 import { NewGame } from './screens/NewGame';
@@ -23,6 +24,7 @@ function screenFor(id: ScreenId): ReactNode {
     case 'hq': return <Dashboard />;
     case 'drivers': return <Drivers />;
     case 'staff': return <Staff />;
+    case 'dev': return <Development />;
     case 'car': return <Car />;
     case 'finance': return <Finance />;
     case 'standings': return <Standings />;

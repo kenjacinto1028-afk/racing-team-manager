@@ -540,3 +540,17 @@ table.data tr.next td { background: rgba(255,255,255,.03); }
 .chip { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 6px; background: var(--surface-2); margin: 1px 4px 1px 0; white-space: nowrap; }
 tr.slot-first td { border-top: 1px solid var(--border-strong); }
 .setup-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); padding: 6px 0; }
+
+/* ---- Development (Phase 13) ---- */
+.traits { display: inline-flex; flex-wrap: wrap; gap: 4px; vertical-align: middle; margin-left: 4px; }
+.trait { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; border: 1px solid currentColor; }
+.trait.good { color: var(--info); }
+.trait.bad { color: var(--warn); }
+.focus-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin: 6px 0 10px; }
+.focus-btn { padding: 8px 4px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-dim); font: inherit; font-size: 12px; cursor: pointer; }
+.focus-btn:hover { color: var(--text); border-color: var(--border-strong); }
+.focus-btn.on { border-color: var(--accent); background: var(--accent-soft); color: var(--text); font-weight: 600; }
+.academy-card { display: flex; flex-direction: column; gap: 6px; padding: var(--s-4); border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); }
+.level-pips { display: flex; gap: 6px; margin: 4px 0 8px; }
+.level-pips i { flex: 1; height: 6px; border-radius: 3px; background: var(--surface-2); border: 1px solid var(--border); }
+.level-pips i.on { background: var(--accent); border-color: var(--accent); }

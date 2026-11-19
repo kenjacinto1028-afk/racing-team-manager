@@ -4,6 +4,7 @@ import { TRACKS } from '../data/tracks';
 import { clamp, createRng, hashSeed, type Rng } from './rng';
 import { initialSponsors } from './sponsors';
 import { defaultCarFields } from './car';
+import { defaultDevFields, defaultDriverFields, refreshYouthPool } from './development';
 import type {
   CarStats, Driver, GameState, LeagueState, Staff, StaffRole, Team, TierId,
 } from './types';
@@ -79,6 +80,7 @@ export function generateDriver(ctx: GenCtx, tier: TierId, opts: DriverOpts = {})
     experience: r1(expBase),
     contract: null,
     teamId: opts.teamId ?? null,
+    ...defaultDriverFields(rng),
   };
   // Young drivers have headroom; veterans are near their peak.
   const headroom = age < 22 ? rng.int(8, 25) : age < 26 ? rng.int(3, 12) : rng.int(0, 3);
@@ -170,6 +172,7 @@ function buildTeam(
     morale: 70,
     spend: 0,
     ...defaultCarFields(isPlayer ? undefined : rng),
+    ...defaultDevFields(isPlayer ? undefined : rng, quality),
   };
   return { team, drivers, staff };
 }
@@ -241,6 +244,7 @@ export function generateWorld(seed: number, player: PlayerSetup): GameState {
     sponsors: { active: [], offers: [] },
     settings: { budgetCap: false },
     setup: { wing: 'medium', suspension: 'medium' },
+    youthPool: [],
   };
-  return initialSponsors(world);
+  return refreshYouthPool(initialSponsors(world));
 }

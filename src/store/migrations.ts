@@ -4,10 +4,11 @@ import { calendarWeeks, createGenCtx, generateStaff } from '../engine/generate';
 import { createRng, hashSeed } from '../engine/rng';
 import { initialSponsors } from '../engine/sponsors';
 import { defaultCarFields } from '../engine/car';
+import { defaultDevFields, refreshYouthPool } from '../engine/development';
 import type { GameState, TierId } from '../engine/types';
 
 /** Bump when the saved shape changes, and add a step to MIGRATIONS below. */
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 
 type Save = Record<string, any>;
 
@@ -47,6 +48,16 @@ const MIGRATIONS: Record<number, (s: Save) => Save> = {
     if (!g) return s;
     const teams = Object.fromEntries(Object.entries(g.teams).map(([id, t]) => [id, { ...defaultCarFields(), ...t }]));
     return { ...s, weekend: null, race: null, game: { ...g, teams, setup: g.setup ?? { wing: 'medium', suspension: 'medium' } } };
+  },
+  // v4 -> v5: driver morale/traits/training, facilities, youth academy and pool.
+  4: (s) => {
+    const g = s.game as GameState | null;
+    if (!g) return s;
+    const drivers = Object.fromEntries(Object.entries(g.drivers).map(([id, d]) => [id, { morale: 70, traits: [], training: 'balanced', ...(d as object) }]));
+    const rng = createRng(hashSeed(g.seed, 'migrate', 5));
+    const teams = Object.fromEntries(Object.entries(g.teams).map(([id, t]) => [id, { ...defaultDevFields(t.isPlayer ? undefined : rng, 0.4), ...t }]));
+    const game = refreshYouthPool({ ...g, drivers, teams, youthPool: [] } as unknown as GameState);
+    return { ...s, weekend: null, race: null, game };
   },
 };
 

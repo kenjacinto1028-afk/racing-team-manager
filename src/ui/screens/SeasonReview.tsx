@@ -114,7 +114,7 @@ export function SeasonReview() {
                       </div>
                       <div className="renew-actions">
                         <span className="small">{money(sal)}/race</span>
-                        {[1, 2, 3].map((y) => (
+                        {p.kind === 'driver' && (g.drivers[p.id].morale ?? 70) < 35 ? <span className="bad small"><Tip k="driverMorale">Wants out</Tip></span> : [1, 2, 3].map((y) => (
                           <button key={y} className="btn btn-sm" onClick={() => { renew(p.kind, p.id, y); show(`${p.name} renewed for ${y} season${y > 1 ? 's' : ''}.`); }}>{y} yr</button>
                         ))}
                       </div>

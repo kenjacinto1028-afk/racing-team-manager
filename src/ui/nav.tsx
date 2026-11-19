@@ -1,12 +1,13 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
 
 export type ScreenId =
-  | 'hq' | 'drivers' | 'staff' | 'car' | 'finance' | 'standings' | 'race' | 'review' | 'glossary';
+  | 'hq' | 'drivers' | 'staff' | 'dev' | 'car' | 'finance' | 'standings' | 'race' | 'review' | 'glossary';
 
 export const SCREENS: { id: ScreenId; label: string; icon: string; blurb: string; hidden?: boolean }[] = [
   { id: 'hq', label: 'HQ Dashboard', icon: '⌂', blurb: 'Your team at a glance: next race, budget and alerts.' },
   { id: 'drivers', label: 'Drivers', icon: '◉', blurb: 'Your two drivers, their stats and contracts, plus the transfer market.' },
   { id: 'staff', label: 'Staff', icon: '✦', blurb: 'Engineers and mechanics who make the car faster and more reliable.' },
+  { id: 'dev', label: 'Development', icon: '↗', blurb: 'Training, youth academy and facilities.' },
   { id: 'car', label: 'Car / R&D', icon: '⚙', blurb: 'Spend money on research to improve engine, aero, chassis and reliability.' },
   { id: 'finance', label: 'Finance', icon: '$', blurb: 'Money in and out, sponsor deals and their goals, and a season forecast.' },
   { id: 'standings', label: 'Standings', icon: '☰', blurb: 'The race calendar and the championship tables.' },

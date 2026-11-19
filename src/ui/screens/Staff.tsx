@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { STAFF_ROLES } from '../../engine/generate';
 import { releaseCost, staffOffer } from '../../engine/market';
+import { courseCost } from '../../engine/development';
 import type { Staff as StaffT, StaffRole } from '../../engine/types';
 import { useGame } from '../../store/gameStore';
 import { ConfirmButton, Tabs, useFlash } from '../components/bits';
@@ -22,6 +23,7 @@ export function Staff() {
   const { g, team } = usePlayer();
   const hire = useGame((s) => s.hireStaff);
   const release = useGame((s) => s.releaseStaff);
+  const course = useGame((s) => s.sendOnCourse);
   const racing = useGame((s) => !!s.race);
   const [role, setRole] = useState<StaffRole | 'all'>('all');
   const [flash, show] = useFlash();
@@ -74,6 +76,11 @@ export function Staff() {
                     <span>{money(s.contract?.salary ?? 0)}/race</span>
                     <span>{s.contract?.yearsLeft ?? 0} season(s)</span>
                   </div>
+                  <button className="btn btn-sm" disabled={racing || s.courseSeason === g.season || s.rating >= 95 || courseCost(g, s.id) > team.budget}
+                    title={s.courseSeason === g.season ? 'Already on a course this season' : 'Rating +2 to +4'}
+                    onClick={() => { const res = course(s.id); show(res.ok ? `${s.name} finished a course.` : res.reason, res.ok ? 'good' : 'bad'); }}>
+                    <Tip k="staffCourse" plain>Course · {money(courseCost(g, s.id))}</Tip>
+                  </button>
                   {(() => {
                     const cost = s.contract ? releaseCost(s.contract.salary, s.contract.yearsLeft) : 0;
                     return (

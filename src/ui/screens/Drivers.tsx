@@ -9,6 +9,7 @@ import { DataTable, type Column } from '../components/DataTable';
 import { Rating, StatBar } from '../components/StatBar';
 import { Tip } from '../components/Tip';
 import { ContractTalks } from '../components/ContractTalks';
+import { MoraleBar, TraitChips } from './Development';
 import { potentialRange } from '../../engine/scouting';
 import { FLAG, money } from '../format';
 import { usePlayer } from '../hooks';
@@ -65,7 +66,7 @@ export function Drivers() {
 
   type Row = (typeof market)[number];
   const cols: Column<Row>[] = [
-    { key: 'name', label: 'Driver', sort: (r) => r.d.lastName, render: (r) => <span>{FLAG[r.d.nationality]} <b>{r.d.firstName} {r.d.lastName}</b>{r.d.payBudget ? <Tip k="payDriver" plain><span className="badge badge-pay">Pay</span></Tip> : null}</span> },
+    { key: 'name', label: 'Driver', sort: (r) => r.d.lastName, render: (r) => <span>{FLAG[r.d.nationality]} <b>{r.d.firstName} {r.d.lastName}</b> <TraitChips d={r.d} />{r.d.payBudget ? <Tip k="payDriver" plain><span className="badge badge-pay">Pay</span></Tip> : null}</span> },
     { key: 'age', label: 'Age', tip: 'age', align: 'center', sort: (r) => r.d.age, render: (r) => r.d.age },
     { key: 'ovr', label: 'OVR', tip: 'overall', align: 'center', sort: (r) => r.ovr, render: (r) => <Rating v={r.ovr} k="overall" /> },
     { key: 'pace', label: 'PAC', tip: 'pace', align: 'center', sort: (r) => r.d.pace, render: (r) => r.d.pace },
@@ -109,10 +110,11 @@ export function Drivers() {
                 <div className="driver-head">
                   <div>
                     <div className="driver-name">{d.firstName} <b>{d.lastName}</b></div>
-                    <div className="muted small">{FLAG[d.nationality]} · Age {d.age} · <Tip k="potential">Potential</Tip> {potStr(d)}{d.payBudget ? <Tip k="payDriver" plain><span className="badge badge-pay">Pay driver</span></Tip> : null}</div>
+                    <div className="muted small">{FLAG[d.nationality]} · Age {d.age} · <Tip k="potential">Potential</Tip> {potStr(d)}{d.payBudget ? <Tip k="payDriver" plain><span className="badge badge-pay">Pay driver</span></Tip> : null} <TraitChips d={d} /></div>
                   </div>
                   <div className="ovr-badge"><Tip k="overall" plain>{driverOverall(d)}</Tip><span>OVR</span></div>
                 </div>
+                <MoraleBar m={d.morale} />
                 {STATS.map((s) => <StatBar key={s.k} k={s.k} label={s.label} value={d[s.k] as number} compare={potentialRange(g, d).hi} compareLabel={`Potential ${potStr(d)}`} />)}
                 <div className="contract-row">
                   {(d.contract?.salary ?? 0) < 0

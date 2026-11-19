@@ -14,7 +14,7 @@ export interface QualiEntry {
 export function runQualifying(field: Competitor[], track: Track, seed: number): QualiEntry[] {
   const rng = createRng(hashSeed(seed, 'quali', track.id));
   const laps = field.map((c) => {
-    let t = baseLap(c, track) + weekendForm(seed, c) + COMPOUND_OFFSET.soft + rng.normal(0, lapSpread(c) * 0.8);
+    let t = baseLap(c, track) + weekendForm(seed, c) + COMPOUND_OFFSET.soft + (c.qualiDelta ?? 0) + rng.normal(0, lapSpread(c) * 0.8);
     if (rng.chance(0.03 * (1.5 - c.consistency / 100))) t += rng.float(0.5, 2); // scrappy lap
     return { driverId: c.driverId, teamId: c.teamId, time: Math.round(t * 1000) / 1000 };
   });

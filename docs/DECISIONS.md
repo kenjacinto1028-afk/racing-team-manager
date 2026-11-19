@@ -4,6 +4,10 @@ Record every design or technical decision here, newest first, so future sessions
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-11-19 | Driver growth comes from per-race training plus the existing winter jump, capped at potential | Visible progress during a season |
+| 2026-11-19 | Driver morale stacks with team morale (each worth up to ~±0.1 s/lap) | Small, but felt over a race |
+| 2026-11-19 | Unsigned youth prospects are deleted at season end | Keeps the save from growing |
+| 2026-11-19 | AI teams get facility levels 0-3 from team strength; they don't build more | Keeps AI simple |
 | 2026-11-19 | Parts add to the base ratings (effective car); quick stat upgrades stay | Keeps v1 R&D working; parts add choices |
 | 2026-11-19 | Engine/gearbox wear and grid penalties are per team, not per car | Half the UI, same decision |
 | 2026-11-19 | Setup is one per team (wing + suspension), hinted by a race engineer rated 50+ | Gives the engineer a visible job |

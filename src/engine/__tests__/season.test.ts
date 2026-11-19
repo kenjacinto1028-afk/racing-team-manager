@@ -100,7 +100,7 @@ describe('promotion and relegation', () => {
 describe('ageing', () => {
   const base: Driver = {
     id: 'x', firstName: 'A', lastName: 'B', nationality: 'GB', age: 19, potential: 80,
-    pace: 50, consistency: 50, racecraft: 50, tyreManagement: 50, experience: 20, contract: null, teamId: null,
+    pace: 50, consistency: 50, racecraft: 50, tyreManagement: 50, experience: 20, contract: null, teamId: null, morale: 70, traits: [], training: 'balanced',
   };
   it('young drivers improve toward potential', () => {
     const d = ageDriver(base, createRng(1));

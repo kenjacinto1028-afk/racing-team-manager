@@ -25,6 +25,13 @@ export interface Competitor {
   tyreWearMult?: number;
   /** Mechanical failure multiplier from worn engine/gearbox (1 = fresh). */
   mechRisk?: number;
+  /** Driver-trait effects (all optional; missing = no effect). */
+  crashMult?: number;
+  mistakeMult?: number;
+  /** Seconds gained (negative) on the opening lap. */
+  startDelta?: number;
+  /** Seconds gained (negative) on the qualifying lap. */
+  qualiDelta?: number;
 }
 
 export const COMPOUNDS: Compound[] = ['soft', 'medium', 'hard'];
@@ -74,7 +81,7 @@ export function lapSpread(c: Competitor): number {
 /** Chance per lap that a car retires (mechanical failure or crash). */
 export function dnfChance(c: Competitor): { mechanical: number; crash: number } {
   const mechanical = 0.0022 * (1.7 - c.car.reliability / 100) * (1.3 - c.mechanic / 200) * (c.mechRisk ?? 1);
-  const crash = 0.0007 * (1.6 - c.consistency / 100) * (1.3 - c.experience / 250);
+  const crash = 0.0007 * (1.6 - c.consistency / 100) * (1.3 - c.experience / 250) * (c.crashMult ?? 1);
   return { mechanical, crash };
 }
 
