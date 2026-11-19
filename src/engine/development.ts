@@ -287,7 +287,7 @@ export function promoteYouth(state: GameState, driverId: string): DevResult {
     ok: true,
     state: {
       ...state,
-      drivers: { ...state.drivers, [driverId]: { ...d, academyTeamId: null, teamId: pid, contract: { salary, yearsLeft: 2 } } },
+      drivers: { ...state.drivers, [driverId]: { ...d, academyTeamId: null, academyGrad: pid, teamId: pid, contract: { salary, yearsLeft: 2 } } },
       teams: { ...state.teams, [pid]: { ...team, academy: team.academy.filter((x) => x !== driverId), driverIds: [...team.driverIds, driverId] } },
     },
   };

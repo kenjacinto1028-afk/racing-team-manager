@@ -1,4 +1,5 @@
 // Builds race inputs from the game state.
+import { updateRecords, type RecordBreak } from './records';
 import { TRACK_BY_ID } from '../data/tracks';
 import { hashSeed } from './rng';
 import type { Competitor } from './performance';
@@ -93,8 +94,14 @@ export function startRace(w: Weekend, trackId: string, opts: { playerDriverIds?:
 
 /** Record a finished race: result, points and money. */
 export function completeRace(state: GameState, tier: TierId, race: RaceState, round: number): GameState {
+  return completeRaceDetailed(state, tier, race, round).state;
+}
+
+/** Same as completeRace, but also reports any all-time records that fell. */
+export function completeRaceDetailed(state: GameState, tier: TierId, race: RaceState, round: number): { state: GameState; broken: RecordBreak[] } {
   const result = raceToResult(race, round);
-  return developAfterRace(afterRace(applyRaceFinances(recordResult(state, tier, result), tier), tier), tier, result);
+  const next = developAfterRace(afterRace(applyRaceFinances(recordResult(state, tier, result), tier), tier), tier, result);
+  return updateRecords(next, tier, result);
 }
 
 /** Simulate a tier's next race entirely with AI (used for the leagues the player is not in). */

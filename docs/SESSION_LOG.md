@@ -4,6 +4,14 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-19: Phase 15 World records and feats
+- New Records screen (sidebar): Record book (most wins, podiums, points, starts, titles, best season, youngest/oldest winner, biggest winning margin), Track records (fastest lap ever per track), and a Feats badge wall.
+- 18 feats for the player, e.g. win from 15th or lower, grand slam, one-two, back-to-back promotions, close shave with money.
+- When a record falls: headlines on the race result, an HQ alert, and a purple "lap record pace" banner during the live race.
+- Save version 6; old saves keep playing and fill in records from this season's races.
+- 110 tests pass; browser check, no console errors.
+- **Next:** Phase 16 More leagues.
+
 ## 2026-11-19: Phase 14 Career pages and trophies
 - Profile pages for drivers, staff and teams: current stats, rating-by-season chart, season-by-season table (live season included), personal records (titles, wins, podiums, points, best finish, best season, points streak), trophy cabinet.
 - History screen: your team's seasons and trophies (league titles, promotions, drivers' titles) plus a Champions table for every league and season.

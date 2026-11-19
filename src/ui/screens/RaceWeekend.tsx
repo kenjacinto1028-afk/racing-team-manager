@@ -15,6 +15,7 @@ import { unitAllowance } from '../../engine/car';
 import { FLAG, gapStr, lapTime, money, ordinal } from '../format';
 import { usePlayer } from '../hooks';
 import { DriverLink } from '../components/Links';
+import { NewsBanner } from '../components/News';
 import { useNav } from '../nav';
 
 /** Real seconds per lap at 1x. */
@@ -192,6 +193,8 @@ function LiveRace({ race, g, team }: { race: RaceState; g: GameState; team: Team
   const [paused, setPaused] = useState(false);
   const [feedMine, setFeedMine] = useState(false);
   const phase = useRaceClock(race, speed, paused);
+  const rec = g.records?.trackLaps?.[race.track.id];
+  const recordPace = rec && race.fastestLap && race.fastestLap.time < rec.value ? rec : null;
   const mine = race.cars.filter((c) => c.c.teamId === team.id);
   const myIds = new Set(mine.map((c) => c.c.driverId));
   const feed = useMemo(() => [...race.events].reverse().filter((e) => !feedMine || e.driverIds.some((id) => myIds.has(id))).slice(0, 40),
@@ -218,6 +221,9 @@ function LiveRace({ race, g, team }: { race: RaceState; g: GameState; team: Team
           {race.finished && <button className="btn btn-primary btn-lg" onClick={() => finish()}>Results & payout ›</button>}
         </div>
       </div>
+      {recordPace && (
+        <div className="record-alert"><span>⏱</span><span><Tip k="lapRecord">Lap record</Tip> pace! {g.drivers[race.fastestLap!.driverId]?.lastName} is under the all-time best here ({lapTime(recordPace.value)}) with {lapTime(race.fastestLap!.time)}.</span></div>
+      )}
       <div className="lap-progress"><i style={{ width: `${((race.lap + phase) / race.totalLaps) * 100}%` }} /></div>
 
       <div className="race-grid">
@@ -347,6 +353,7 @@ function Results() {
         <p>{g.drivers[winner.driverId].firstName} {g.drivers[winner.driverId].lastName} wins for {g.teams[winner.teamId].name}.</p>
       </div>
       {flash}
+      <NewsBanner records={lastRace.records} feats={lastRace.feats} title="Headlines" />
       <div className="grid grid-2-1">
         <section className="card">
           <DataTable rows={res.entries} columns={cols} rowKey={(r) => r.driverId} rowClass={(r) => (r.teamId === team.id ? 'me' : undefined)} />

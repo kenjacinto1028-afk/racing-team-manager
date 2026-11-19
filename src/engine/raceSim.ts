@@ -295,6 +295,7 @@ export function raceToResult(race: RaceState, round: number): RaceResult {
     totalTime: Math.round(car.totalTime * 1000) / 1000,
     bestLap: Math.round(car.bestLap * 1000) / 1000,
     pitStops: car.pitStops,
+    compounds: car.compoundsUsed,
   }));
   return { round, trackId: race.track.id, entries };
 }

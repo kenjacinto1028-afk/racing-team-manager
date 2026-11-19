@@ -1,3 +1,4 @@
+import { FEAT_BY_ID } from '../../data/feats';
 import { LEAGUES, MOVE_SPOTS } from '../../data/leagues';
 import { TRACK_BY_ID } from '../../data/tracks';
 import { BANKRUPT_STREAK, raceSalaries } from '../../engine/finance';
@@ -37,6 +38,13 @@ export function Dashboard() {
   const openSlots = (g.sponsors.active.some((d) => d.kind === 'title') ? 0 : 1) + Math.max(0, 3 - g.sponsors.active.filter((d) => d.kind === 'partner').length);
   if (openSlots && g.sponsors.offers.length) alerts.push({ kind: 'info', text: `${openSlots} sponsor slot(s) open and ${g.sponsors.offers.length} offer(s) waiting.`, to: 'finance' });
   if (expiring.length) alerts.push({ kind: 'info', text: `${expiring.length} contract(s) end this season. Renew them in the Season Review.` });
+  if (!lastRace && lastReview?.season === g.season - 1) {
+    for (const id of lastReview.newFeats ?? []) if (FEAT_BY_ID[id]) alerts.push({ kind: 'info', text: `${FEAT_BY_ID[id].icon} Feat unlocked last season: ${FEAT_BY_ID[id].name}.`, to: 'records' });
+  }
+  if (lastRace && lastRace.season === g.season) {
+    for (const r of lastRace.records ?? []) alerts.push({ kind: 'info', text: `⏱ ${r.label} at ${TRACK_BY_ID[r.trackId]?.name}: ${g.drivers[r.driverId]?.firstName ?? ''} ${g.drivers[r.driverId]?.lastName ?? ''}, ${r.detail}.`, to: 'records' });
+    for (const id of lastRace.feats ?? []) if (FEAT_BY_ID[id]) alerts.push({ kind: 'info', text: `${FEAT_BY_ID[id].icon} Feat unlocked: ${FEAT_BY_ID[id].name}.`, to: 'records' });
+  }
 
   const zone = (i: number) => (tier > 1 && i < MOVE_SPOTS ? 'zone-up' : tier < 3 && i >= table.length - MOVE_SPOTS ? 'zone-down' : '');
   const snapshot = table.map((r, i) => ({ r, i })).filter(({ r, i }) => i < 5 || r.id === team.id);

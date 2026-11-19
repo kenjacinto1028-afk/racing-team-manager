@@ -7,7 +7,9 @@ import { signSponsor as engineSignSponsor } from '../engine/sponsors';
 import { fitPart as engineFitPart, replaceUnit as engineReplaceUnit, setConcept as engineSetConcept, startProject as engineStartProject } from '../engine/car';
 import { previewReview, renewContract as engineRenew, runOffseason, syncOtherLeagues, type SeasonReview } from '../engine/offseason';
 import { applyOrder, raceToResult, simulateToEnd, stepLap, type RaceState } from '../engine/raceSim';
-import { completeRace, prepareWeekend, startRace as engineStartRace, type Weekend } from '../engine/raceSetup';
+import { checkRaceFeats, checkSeasonFeats } from '../engine/feats';
+import type { RecordBreak } from '../engine/records';
+import { completeRaceDetailed, prepareWeekend, startRace as engineStartRace, type Weekend } from '../engine/raceSetup';
 import { isLeagueComplete } from '../engine/season';
 import { buildFacility as engineBuild, promoteYouth as enginePromote, releaseYouth as engineReleaseYouth, sendOnCourse as engineCourse, setTraining as engineSetTraining, signYouth as engineSignYouth } from '../engine/development';
 import type { FacilityKind, TrainingFocus, CarConcept, CarSetup, CarStat, Compound, DriverMode, GameState, RaceResult, TierId, UnitKind } from '../engine/types';
@@ -25,6 +27,10 @@ export interface LastRace {
   result: RaceResult;
   budgetBefore: number;
   budgetAfter: number;
+  /** All-time records that fell in this race (any league). */
+  records?: RecordBreak[];
+  /** Feats the player unlocked in this race. */
+  feats?: string[];
 }
 
 export type ActionResult = { ok: true } | { ok: false; reason: string };
@@ -206,12 +212,15 @@ export function createGameStore(storage?: StateStorage, name = 'rtm-save') {
             if (!g || !w || !race) return { ok: false, reason: 'No race to finish' };
             if (!race.finished) return { ok: false, reason: 'The race is still running' };
             const before = g.teams[g.playerTeamId].budget;
-            let next = completeRace(g, w.tier, race, w.round);
+            const done = completeRaceDetailed(g, w.tier, race, w.round);
+            const result = raceToResult(race, w.round);
+            const fe = checkRaceFeats(done.state, result, done.broken, before);
+            let next = fe.state;
             const after = next.teams[next.playerTeamId].budget;
             next = syncOtherLeagues(next);
             set({
               game: next, race: null, weekend: null,
-              lastRace: { season: g.season, tier: w.tier, round: w.round, result: raceToResult(race, w.round), budgetBefore: before, budgetAfter: after },
+              lastRace: { season: g.season, tier: w.tier, round: w.round, result, budgetBefore: before, budgetAfter: after, records: done.broken, feats: fe.unlocked },
             });
             return { ok: true };
           },
@@ -225,8 +234,10 @@ export function createGameStore(storage?: StateStorage, name = 'rtm-save') {
             const g = get().game;
             if (!g) return { ok: false, reason: 'No game in progress' };
             if (!seasonOver(g)) return { ok: false, reason: 'The season is not finished' };
-            const { state, review } = runOffseason(g);
-            set({ game: state, lastReview: review, lastRace: null, weekend: null, race: null });
+            const off = runOffseason(g);
+            const fe = checkSeasonFeats(off.state, off.review);
+            const review = { ...off.review, newFeats: fe.unlocked };
+            set({ game: fe.state, lastReview: review, lastRace: null, weekend: null, race: null });
             return { ok: true };
           },
         };

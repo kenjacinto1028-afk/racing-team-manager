@@ -42,6 +42,8 @@ export interface Driver {
   training: TrainingFocus;
   /** Youth academy team (not racing yet). */
   academyTeamId?: string | null;
+  /** Team whose academy produced this driver. */
+  academyGrad?: string;
 }
 
 export type TrainingFocus = 'pace' | 'racecraft' | 'tyres' | 'fitness' | 'balanced';
@@ -145,6 +147,8 @@ export interface ResultEntry {
   totalTime: number;
   bestLap: number;
   pitStops: number;
+  /** Tyre compounds used, in order. */
+  compounds?: Compound[];
 }
 
 export interface RaceResult {
@@ -284,4 +288,26 @@ export interface GameState {
   setup: CarSetup;
   /** Teenagers available to sign to the youth academy this season. */
   youthPool: string[];
+  /** All-time race records (track lap records, youngest/oldest winner, biggest win margin). */
+  records: RaceRecords;
+  /** The player's unlocked feats: id -> when. */
+  feats: Record<string, { season: number; year: number }>;
+}
+
+export interface RecordEntry {
+  driverId: string;
+  teamId: string;
+  /** Lap time, age or margin, depending on the record. */
+  value: number;
+  season: number;
+  year: number;
+  tier: TierId;
+  trackId: string;
+}
+
+export interface RaceRecords {
+  trackLaps: Record<string, RecordEntry>;
+  youngestWinner?: RecordEntry;
+  oldestWinner?: RecordEntry;
+  biggestMargin?: RecordEntry;
 }

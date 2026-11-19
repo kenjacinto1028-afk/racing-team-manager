@@ -1,6 +1,6 @@
 # Progress
 
-**Current phase:** Phase 14 Career pages and trophies done. Next: Phase 15 World records and feats
+**Current phase:** Phase 15 World records and feats done. Next: Phase 16 More leagues
 **Last updated:** 2026-11-19
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
@@ -112,11 +112,12 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 - [x] Team history page (History screen: your team + all past champions)
 - [x] Click any name to open its profile (Standings, HQ, Drivers, Staff, Race, Season Review)
 
-## Phase 15: World records and feats (Sonnet, Haiku data)
-- [ ] Record book (all leagues, all seasons)
-- [ ] Track records
-- [ ] Player feats and badge wall
-- [ ] Record-broken alerts
+## Phase 15: World records and feats ✅
+- [x] Record book (all leagues, all seasons) (`engine/records.ts`, Records screen)
+- [x] Track records (fastest lap ever at each track)
+- [x] Player feats (18) and badge wall (`data/feats.ts`, `engine/feats.ts`)
+- [x] Record-broken alerts: race results headlines, HQ alerts, live "lap record pace" banner
+- [x] Save v6 (old saves seed records from the current season)
 
 ## Phase 16: More leagues (Opus engine, Sonnet screens, Haiku data)
 - [x] Decide: 5-tier ladder + side championships for tiers 3-5

@@ -570,3 +570,16 @@ tr.slot-first td { border-top: 1px solid var(--border-strong); }
 .rec-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-3); }
 .rec { padding: var(--s-3); border-radius: 10px; background: var(--surface-2); }
 .rec .stat-value { font-size: 26px; }
+
+/* Records and feats (Phase 15) */
+.feat-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--s-3); margin-top: var(--s-3); }
+.feat-badge { display: flex; flex-direction: column; gap: 4px; padding: var(--s-3) var(--s-4); border-radius: var(--radius); background: var(--surface-2); border: 1px dashed var(--border); opacity: .55; }
+.feat-badge .ic { font-size: 24px; filter: grayscale(1); }
+.feat-badge.on { opacity: 1; border: 1px solid #d4af37; background: color-mix(in srgb, #d4af37 7%, var(--surface-2)); }
+.feat-badge.on .ic { filter: none; }
+.feat-when { font-size: 11px; color: #d4af37; letter-spacing: .04em; text-transform: uppercase; }
+.news-card { border-color: color-mix(in srgb, #d4af37 45%, var(--border)); }
+.news-row { display: flex; gap: var(--s-3); align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.news-row:last-child { border-bottom: 0; }
+.news-icon { font-size: 18px; width: 24px; text-align: center; }
+.record-alert { display: flex; gap: var(--s-3); align-items: center; padding: 8px var(--s-4); margin: var(--s-3) 0; border-radius: var(--radius); border: 1px solid #c77dff; background: color-mix(in srgb, #c77dff 12%, var(--surface)); font-weight: 600; }

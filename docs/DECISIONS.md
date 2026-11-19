@@ -4,6 +4,9 @@ Record every design or technical decision here, newest first, so future sessions
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-11-19 | All-time race records (lap per track, youngest/oldest winner, biggest margin) are stored in the save; career records stay computed from the archive | Lap times aren't in the archive; the rest already is |
+| 2026-11-19 | The first race at a track sets its record quietly; only later beats are announced | Avoids a flood of "new record" alerts in season 1 |
+| 2026-11-19 | Records get their own sidebar screen; History stays for teams and champions | Easier to find, keeps History focused |
 | 2026-11-19 | Careers, trophies and records are computed from the season archive plus the live season, not stored separately | One source of truth; no save change |
 | 2026-11-19 | Profiles open through the nav history (a 'profile' screen with a driver/staff/team id) | Back/Forward work like any other screen |
 | 2026-11-19 | Driver growth comes from per-race training plus the existing winter jump, capped at potential | Visible progress during a season |

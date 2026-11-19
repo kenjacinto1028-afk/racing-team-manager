@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { StateStorage } from 'zustand/middleware';
 import { generateWorld } from '../../engine/generate';
+import { completeAllLeagues } from '../../engine/offseason';
 import { createGameStore } from '../gameStore';
 import { migrateSave, SAVE_VERSION } from '../migrations';
 
@@ -23,6 +24,15 @@ describe('save migration', () => {
     expect(m.game.leagues[3].weeks).toHaveLength(old.game.leagues[3].calendar.length);
     expect(m.game.teams).toEqual(old.game.teams);
     expect(m.game.playerTeamId).toBe(old.game.playerTeamId);
+  });
+
+  it('v5 -> v6 seeds the record book from races already run', () => {
+    const g = completeAllLeagues(generateWorld(12, SETUP)) as unknown as Record<string, any>;
+    delete g.records; delete g.feats;
+    const m = migrateSave({ saveVersion: 5, game: g, weekend: null, race: null, raceSpeed: 4, lastRace: null, lastReview: null }, 5)!;
+    expect(Object.keys(m.game.records.trackLaps).length).toBeGreaterThan(0);
+    expect(m.game.records.youngestWinner).toBeDefined();
+    expect(m.game.feats).toEqual({});
   });
 
   it('refuses unknown or future versions', () => {

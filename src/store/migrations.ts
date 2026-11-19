@@ -5,10 +5,11 @@ import { createRng, hashSeed } from '../engine/rng';
 import { initialSponsors } from '../engine/sponsors';
 import { defaultCarFields } from '../engine/car';
 import { defaultDevFields, refreshYouthPool } from '../engine/development';
+import { emptyRecords, updateRecords } from '../engine/records';
 import type { GameState, TierId } from '../engine/types';
 
 /** Bump when the saved shape changes, and add a step to MIGRATIONS below. */
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
 
 type Save = Record<string, any>;
 
@@ -58,6 +59,15 @@ const MIGRATIONS: Record<number, (s: Save) => Save> = {
     const teams = Object.fromEntries(Object.entries(g.teams).map(([id, t]) => [id, { ...defaultDevFields(t.isPlayer ? undefined : rng, 0.4), ...t }]));
     const game = refreshYouthPool({ ...g, drivers, teams, youthPool: [] } as unknown as GameState);
     return { ...s, weekend: null, race: null, game };
+  },
+  // v5 -> v6: all-time records and the player's feats.
+  5: (s) => {
+    const g = s.game as GameState | null;
+    if (!g) return s;
+    // Seed the records from this season's races so far (older seasons kept no lap times).
+    let game: GameState = { ...g, records: g.records ?? emptyRecords(), feats: g.feats ?? {} };
+    for (const t of TIERS) for (const r of game.leagues[t]?.results ?? []) game = updateRecords(game, t, r).state;
+    return { ...s, game };
   },
 };
 

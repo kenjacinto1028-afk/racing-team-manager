@@ -28,6 +28,8 @@ export interface SeasonReview {
   playerPrize: number;
   retired: string[];
   sponsors: SponsorSeasonResult[];
+  /** Feats the player unlocked at season end. */
+  newFeats?: string[];
 }
 
 /** Race every tier to the end of its calendar (AI only). */

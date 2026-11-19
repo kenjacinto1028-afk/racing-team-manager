@@ -1,3 +1,4 @@
+import { emptyRecords } from './records';
 import { LEAGUES, TEAMS_PER_TIER, TIERS, STARTING_TIER, DRIVERS_PER_TEAM } from '../data/leagues';
 import { NATIONS, STAFF_FIRST, STAFF_LAST, TEAM_NAMES } from '../data/names';
 import { TRACKS } from '../data/tracks';
@@ -245,6 +246,8 @@ export function generateWorld(seed: number, player: PlayerSetup): GameState {
     settings: { budgetCap: false },
     setup: { wing: 'medium', suspension: 'medium' },
     youthPool: [],
+    records: emptyRecords(),
+    feats: {},
   };
   return refreshYouthPool(initialSponsors(world));
 }
