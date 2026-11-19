@@ -86,7 +86,7 @@ export function Dashboard() {
         <div className="card kpi">
           <div className="stat-label"><Tip text="The next round of the championship. Each race weekend is qualifying, then the race.">Next race</Tip></div>
           <div className="stat-value sm">{nextTrack ? nextTrack.name : 'Season over'}</div>
-          <div className="kpi-sub">{nextTrack ? `${nextTrack.country} · ${nextTrack.laps} laps` : ''}</div>
+          <div className="kpi-sub">{nextTrack ? `Week ${L.weeks[round]} · ${nextTrack.country} · ${nextTrack.laps} laps` : ''}</div>
         </div>
       </div>
 

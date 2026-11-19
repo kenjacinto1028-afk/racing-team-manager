@@ -4,6 +4,13 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-19: Phase 10 Foundations
+- History archive: at each season end the game keeps final tables, champions, and a season line for every driver (team, league, races, wins, podiums, points, position) and staff member. About 10 KB per season. Helpers `driverCareer` / `staffCareer` ready for Phase 14.
+- Save upgrades: `store/migrations.ts` upgrades saves one version at a time (now v2). A v1 save loads with its career intact; only unknown versions reset.
+- Calendar: each race has a week number (week 10 to 46), shown on Standings > Calendar and HQ.
+- 64 tests pass. Browser check: loaded a v1 save, finished the season, history saved, no console errors. Not pushed.
+- **Next:** Phase 11 Economy and finances.
+
 ## 2026-11-19: v2 roadmap
 - Wrote `docs/ROADMAP.md`: 7 phases (10-16) covering economy, cars and parts, development, careers, records and more leagues, with model picks per phase. Added them to `PROGRESS.md`.
 - Phase 16 decided: 5 tiers plus side championships for tiers 3-5. New games will start in tier 5. Still open: migrating saves instead of resetting (Phase 10).

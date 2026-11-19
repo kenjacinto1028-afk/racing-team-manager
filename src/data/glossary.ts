@@ -54,6 +54,7 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
   trackOvertaking: { term: 'Overtaking difficulty', category: 'Racing', short: 'How hard it is to pass here. Street circuits are narrow and hard; long straights make it easy.' },
   teamPrincipal: { term: 'Team principal', category: 'Racing', short: "The boss of the team. That's you." },
   // Season
+  week: { term: 'Week', category: 'Season', short: 'The week of the year a race is held. Seasons run from about week 10 (March) to week 46 (November).' },
   points: { term: 'Points', category: 'Season', short: 'The top 10 finishers score 25, 18, 15, 12, 10, 8, 6, 4, 2 and 1.' },
   standings: { term: 'Standings', category: 'Season', short: 'The championship table, ordered by points. Ties go to whoever has more wins, then more 2nd places, and so on.' },
   constructors: { term: "Teams' championship", category: 'Season', short: "Both drivers' points added together for each team. This decides promotion and relegation." },

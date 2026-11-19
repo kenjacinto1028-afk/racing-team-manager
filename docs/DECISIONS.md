@@ -22,7 +22,9 @@ Record every design or technical decision here, newest first, so future sessions
 | 2026-11-19 | The other two leagues race in the background, kept in step with the player's league | Their tables are live all season and finish together |
 | 2026-11-19 | Between seasons every car drifts 20% back toward its tier average | Rivals develop too; stops stats inflating to 99 |
 | 2026-11-19 | Player contracts that run out are lost unless renewed in the Season Review | Gives a real decision each off-season |
-| 2026-11-19 | Old saves with a different `saveVersion` are reset, not migrated (for now) | No real saves exist yet |
+| 2026-11-19 | Old saves are upgraded step by step (`store/migrations.ts`); only unknown or future versions reset | The game is live, real saves exist |
+| 2026-11-19 | Season history keeps summaries only (tables, champions, per-person season lines), not every race result | Keeps the save small over many seasons |
+| 2026-11-19 | Race weeks are spread evenly from week 10 to week 46, same pattern every season | Simple, predictable base for per-week sponsors and training |
 | 2026-11-19 | Race runs lap by lap (`stepLap`); each lap uses its own derived seed | The live race view and a full skip give identical results |
 | 2026-11-19 | A car that hasn't pitted is called in automatically one lap before the end | Enforces the one-stop rule without the player losing the race |
 | 2026-11-19 | No lapped traffic or safety cars in v1 | Keeps the sim simple; safety cars are on the "Later" list |

@@ -1,6 +1,6 @@
 # Progress
 
-**Current phase:** v1 complete. v2 roadmap written (`docs/ROADMAP.md`). Next: Phase 10 Foundations
+**Current phase:** Phase 10 Foundations done. Next: Phase 11 Economy and finances
 **Last updated:** 2026-11-19
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
@@ -75,10 +75,10 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 
 ## v2 roadmap (details in `docs/ROADMAP.md`)
 
-## Phase 10: Foundations (Opus)
-- [ ] History archive saved at each season end
-- [ ] Migrate old saves instead of resetting them
-- [ ] Week numbers on the calendar
+## Phase 10: Foundations ✅
+- [x] History archive saved at each season end (`engine/history.ts`)
+- [x] Migrate old saves instead of resetting them (`store/migrations.ts`, save v2)
+- [x] Week numbers on the calendar
 
 ## Phase 11: Economy and finances (Opus engine, Sonnet screens, Haiku data)
 - [ ] Sponsor deals with goals (title sponsor + 2-3 smaller)

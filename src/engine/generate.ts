@@ -116,6 +116,16 @@ export function makeCalendar(rng: Rng, tier: TierId): string[] {
   return rng.shuffle(TRACKS.map((t) => t.id)).slice(0, LEAGUES[tier].races);
 }
 
+/** First and last race week of a season (roughly March to November). */
+export const SEASON_WEEKS: [number, number] = [10, 46];
+
+/** Spread `races` evenly across the season weeks. Same for every tier size, no randomness. */
+export function calendarWeeks(races: number): number[] {
+  const [first, last] = SEASON_WEEKS;
+  if (races <= 1) return [first];
+  return Array.from({ length: races }, (_, i) => first + Math.round((i * (last - first)) / (races - 1)));
+}
+
 export interface PlayerSetup {
   name: string;
   short: string;
@@ -180,7 +190,7 @@ export function generateWorld(seed: number, player: PlayerSetup): GameState {
       teams[playerTeamId].budget = LEAGUES[tier].startBudget;
       teamIds.push(playerTeamId);
     }
-    leagues[tier] = { tier, teamIds, calendar: makeCalendar(rng, tier), results: [] };
+    leagues[tier] = { tier, teamIds, calendar: makeCalendar(rng, tier), weeks: calendarWeeks(LEAGUES[tier].races), results: [] };
   }
 
   const driverMarket: string[] = [];
@@ -213,5 +223,6 @@ export function generateWorld(seed: number, player: PlayerSetup): GameState {
     driverMarket,
     staffMarket,
     finance: { negativeStreak: 0, bankrupt: false, ledger: [] },
+    history: [],
   };
 }

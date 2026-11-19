@@ -80,7 +80,7 @@ export function Standings() {
       {tab === 'calendar' && (
         <section className="card">
           <table className="data">
-            <thead><tr><th>Rd</th><th>Track</th><th>Laps</th><th>Winner</th><th>{tier === myTier ? 'Your best' : 'Pole sitter'}</th></tr></thead>
+            <thead><tr><th><Tip text="Round: the race's number in the season.">Rd</Tip></th><th><Tip k="week">Week</Tip></th><th>Track</th><th>Laps</th><th>Winner</th><th>{tier === myTier ? 'Your best' : 'Pole sitter'}</th></tr></thead>
             <tbody>
               {L.calendar.map((tid, i) => {
                 const t = TRACK_BY_ID[tid];
@@ -91,6 +91,7 @@ export function Standings() {
                 return (
                   <tr key={tid} className={i === L.results.length ? 'next' : ''}>
                     <td>{i + 1}</td>
+                    <td className="muted">Wk {L.weeks[i]}</td>
                     <td><b>{t.name}</b> <span className="muted small">{t.country}</span></td>
                     <td>{t.laps}</td>
                     <td>{win ? <span>{g.drivers[win.driverId].lastName} <span className="muted small">({g.teams[win.teamId].short})</span></span> : i === L.results.length ? <span className="tag">Next</span> : <span className="muted">-</span>}</td>

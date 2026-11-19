@@ -2,7 +2,8 @@
 import { LEAGUES, TIERS, DRIVERS_PER_TEAM } from '../data/leagues';
 import { createRng, hashSeed, type Rng } from './rng';
 import { applyPrizeMoney, askingSalary, upgradeCost, upgradeGain, techDirectorRating } from './finance';
-import { createGenCtx, driverOverall, generateDriver, generateStaff, makeCalendar, STAFF_ROLES } from './generate';
+import { calendarWeeks, createGenCtx, driverOverall, generateDriver, generateStaff, makeCalendar, STAFF_ROLES } from './generate';
+import { addToHistory } from './history';
 import { autoRaceNext } from './raceSetup';
 import {
   ageAllDrivers, applyPromotionRelegation, driverStandings, isLeagueComplete, seasonMoves, teamStandings,
@@ -129,6 +130,8 @@ function aiDevelop(state: GameState, team: Team, rng: Rng): Team {
 export function runOffseason(input: GameState): { state: GameState; review: SeasonReview } {
   let s = completeAllLeagues(input);
   const review = previewReview(s);
+  // Archive before anything changes: tables, champions, and who drove / worked where.
+  s = addToHistory(s);
   const rng = createRng(hashSeed(s.seed, 'offseason', s.season));
   const ctx = createGenCtx(rng, s.nextId, Object.values(s.drivers).filter((d) => !d.retired).map((d) => d.lastName));
 
@@ -232,7 +235,7 @@ export function runOffseason(input: GameState): { state: GameState; review: Seas
   }
 
   const leagues = { ...s.leagues };
-  for (const tier of TIERS) leagues[tier] = { ...leagues[tier], calendar: makeCalendar(rng, tier), results: [] };
+  for (const tier of TIERS) leagues[tier] = { ...leagues[tier], calendar: makeCalendar(rng, tier), weeks: calendarWeeks(LEAGUES[tier].races), results: [] };
 
   s = {
     ...s,

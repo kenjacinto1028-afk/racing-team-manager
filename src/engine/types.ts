@@ -110,6 +110,8 @@ export interface LeagueState {
   tier: TierId;
   teamIds: string[];
   calendar: string[];
+  /** Week of the year for each race in `calendar` (same order). */
+  weeks: number[];
   results: RaceResult[];
 }
 
@@ -128,6 +130,49 @@ export interface FinanceState {
   ledger: LedgerEntry[];
 }
 
+/** One team's final line in a past season's table. */
+export interface HistoryTeamRow {
+  teamId: string;
+  points: number;
+  wins: number;
+  podiums: number;
+}
+
+/** One driver's season, compact. `pos` = final drivers' championship position. */
+export interface DriverSeasonLine {
+  driverId: string;
+  teamId: string;
+  tier: TierId;
+  races: number;
+  wins: number;
+  podiums: number;
+  points: number;
+  pos: number;
+}
+
+/** One staff member's season: which team and league they worked in, and where that team finished. */
+export interface StaffSeasonLine {
+  staffId: string;
+  teamId: string;
+  tier: TierId;
+  teamPos: number;
+}
+
+/** Short summary of a finished season, kept forever. */
+export interface SeasonArchive {
+  season: number;
+  year: number;
+  /** Final team tables per tier, in finishing order. */
+  tables: Record<TierId, HistoryTeamRow[]>;
+  /** Drivers' champion per tier. */
+  champions: Record<TierId, string | null>;
+  drivers: DriverSeasonLine[];
+  staff: StaffSeasonLine[];
+  playerTeamId: string;
+  playerTier: TierId;
+  playerPos: number;
+}
+
 export interface GameState {
   seed: number;
   season: number;
@@ -143,4 +188,6 @@ export interface GameState {
   /** Unemployed staff ids. */
   staffMarket: string[];
   finance: FinanceState;
+  /** Past seasons, oldest first. */
+  history: SeasonArchive[];
 }

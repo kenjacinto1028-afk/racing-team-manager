@@ -9,8 +9,9 @@ import { completeRace, prepareWeekend, startRace as engineStartRace, type Weeken
 import { isLeagueComplete } from '../engine/season';
 import type { CarStat, Compound, DriverMode, GameState, RaceResult, TierId } from '../engine/types';
 
-/** Bump when the saved shape changes. Old saves are reset. */
-export const SAVE_VERSION = 1;
+import { migrateSave, SAVE_VERSION } from './migrations';
+
+export { SAVE_VERSION };
 
 export type RaceSpeed = 1 | 4 | 16;
 
@@ -185,8 +186,8 @@ export function createGameStore(storage?: StateStorage, name = 'rtm-save') {
           saveVersion: s.saveVersion, game: s.game, weekend: s.weekend, race: s.race,
           raceSpeed: s.raceSpeed, lastRace: s.lastRace, lastReview: s.lastReview,
         }),
-        // Old save shape: start fresh rather than crash.
-        migrate: () => ({ ...initial }) as unknown as GameStore,
+        // Old save shape: upgrade it step by step. Only start fresh if it can't be upgraded.
+        migrate: (saved, version) => (migrateSave(saved, version) ?? { ...initial }) as unknown as GameStore,
       },
     ),
   );
