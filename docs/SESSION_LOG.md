@@ -4,6 +4,15 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-19: Phase 12 Cars, parts and setup
+- Car concept per season (balanced, low-drag, high-downforce, tyre-friendly): worth up to ~0.2 s/lap depending on the track; locked after round 1. AI picks one each winter.
+- Parts: 7 slots, 14 alternative parts with trade-offs on the 4 ratings. Design them as R&D projects (cost up front, 1-4 races, 2 at a time, TD 70+ is a race quicker), then fit for free. AI sometimes designs one over the winter.
+- Weekend setup: wing level and suspension; the ideal is worth -0.16 s/lap, a bad one +0.24. A race engineer rated 50+ tells you the ideal.
+- Engine and gearbox wear: allowance per season (engine 1 per ~4 races, gearbox 1 per ~3); worn units break down more; extra units cost 5 / 3 grid places.
+- Car screen redesigned with tabs: Overview, Parts, Quick upgrades, Engine & gearbox. Qualifying shows grid penalties.
+- Save v4. 89 tests pass incl. a 120-race balance check; browser play of 3 races, no console errors.
+- **Next:** Phase 13 Driver and staff development.
+
 ## 2026-11-19: Phase 11 Economy and finances
 - Sponsors: title sponsor + up to 3 partners, each pays per race and has a season goal (team position, points finishes, podiums, wins). Goal met = bonus; missed = 60% chance they leave. New offers each season, better with a better finish. New games start with a title + 2 partners.
 - Pay drivers (about 1 in 4 lower-league market drivers): bring money per race, no signing fee, fixed deals.

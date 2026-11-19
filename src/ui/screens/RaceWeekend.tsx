@@ -10,6 +10,8 @@ import { TimingTower, TyreBadge } from '../components/TimingTower';
 import { Tip } from '../components/Tip';
 import { TrackMap } from '../components/TrackMap';
 import { TrackProfile } from '../components/TrackProfile';
+import { SetupPanel } from '../components/SetupPanel';
+import { unitAllowance } from '../../engine/car';
 import { FLAG, gapStr, lapTime, money, ordinal } from '../format';
 import { usePlayer } from '../hooks';
 import { useNav } from '../nav';
@@ -74,6 +76,23 @@ function PreRace({ trackId, round, races }: { trackId: string; round: number; ra
           </div>
         </section>
       </div>
+      <div className="grid grid-2">
+        <SetupPanel track={track} />
+        <section className="card">
+          <h3><Tip k="partWear">Engine and gearbox</Tip></h3>
+          {(['engine', 'gearbox'] as const).map((k) => {
+            const u = team.units[k];
+            return (
+              <div key={k} className="setup-row">
+                <span className="small">{k === 'engine' ? 'Engine' : 'Gearbox'} <span className="muted">#{u.used} of {unitAllowance(team.tier, k)}</span></span>
+                <span className={u.wear >= 80 ? 'bad' : u.wear >= 60 ? 'warn' : 'good'}>{u.wear}% worn</span>
+              </div>
+            );
+          })}
+          {team.gridPenalty > 0 && <div className="alert alert-warn" style={{ marginTop: 8 }}><span><Tip k="gridPenalty">Grid penalty</Tip>: both cars drop {team.gridPenalty} places this race.</span></div>}
+          <p className="muted small">Worn units break down more often. Fit new ones on the <button className="link" onClick={() => go('car')}>Car screen</button>.</p>
+        </section>
+      </div>
     </div>
   );
 }
@@ -86,6 +105,8 @@ function Qualifying() {
   const mine = weekend.field.filter((c) => c.teamId === team.id);
   const [compounds, setCompounds] = useState<Record<string, Compound>>(() => Object.fromEntries(mine.map((c) => [c.driverId, 'medium' as Compound])));
   const pole = weekend.qualifying[0];
+  const grid = weekend.grid ?? weekend.qualifying.map((q) => q.driverId);
+  const startPos = (id: string) => grid.indexOf(id) + 1;
 
   type Q = (typeof weekend.qualifying)[number];
   const cols: Column<Q>[] = [
@@ -94,6 +115,7 @@ function Qualifying() {
     { key: 'team', label: 'Team', sort: (r) => g.teams[r.teamId].name, render: (r) => <TeamName team={g.teams[r.teamId]} /> },
     { key: 'time', label: 'Time', align: 'right', sort: (r) => r.time, render: (r) => <span className="mono">{lapTime(r.time)}</span> },
     { key: 'gap', label: 'Gap', tip: 'gap', align: 'right', sort: (r) => r.time, render: (r) => <span className="mono muted">{r.position === 1 ? '-' : gapStr(r.time - pole.time)}</span> },
+    { key: 'grid', label: 'Starts', tip: 'gridPenalty', align: 'right', sort: (r) => startPos(r.driverId), render: (r) => <span>P{startPos(r.driverId)}{weekend.penalties?.[r.driverId] ? <span className="bad small"> (+{weekend.penalties[r.driverId]})</span> : null}</span> },
   ];
 
   return (
@@ -101,7 +123,7 @@ function Qualifying() {
       <div className="page-head">
         <span className="tag">Round {weekend.round} · Qualifying</span>
         <h1 style={{ marginTop: 12 }}>{track.name}</h1>
-        <p><b>{g.drivers[pole.driverId].firstName} {g.drivers[pole.driverId].lastName}</b> takes <Tip k="pole">pole position</Tip>. Your drivers start {mine.map((c) => `P${weekend.qualifying.find((q) => q.driverId === c.driverId)!.position}`).join(' and ')}.</p>
+        <p><b>{g.drivers[pole.driverId].firstName} {g.drivers[pole.driverId].lastName}</b> takes <Tip k="pole">pole position</Tip>. Your drivers start {mine.map((c) => `P${startPos(c.driverId)}`).join(' and ')}.</p>
       </div>
       <div className="grid grid-2-1">
         <section className="card">
@@ -112,7 +134,7 @@ function Qualifying() {
           <p className="muted small">Pick a compound for each driver. Softer tyres are faster but wear quicker. Every car must <Tip k="mandatoryStop">pit at least once</Tip>.</p>
           {mine.map((c) => (
             <div key={c.driverId} className="compound-pick">
-              <div className="compound-driver">{g.drivers[c.driverId].lastName} <span className="muted small">starts P{weekend.qualifying.find((q) => q.driverId === c.driverId)!.position}</span></div>
+              <div className="compound-driver">{g.drivers[c.driverId].lastName} <span className="muted small">starts P{startPos(c.driverId)}</span></div>
               <div className="compound-row">
                 {COMPOUNDS.map((comp) => (
                   <button key={comp} className={'compound-btn' + (compounds[c.driverId] === comp ? ' on' : '')} onClick={() => setCompounds({ ...compounds, [c.driverId]: comp })}>

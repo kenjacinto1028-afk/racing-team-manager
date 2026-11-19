@@ -40,3 +40,7 @@ export function ratingColor(v: number): string {
   if (v >= 40) return 'var(--warn)';
   return 'var(--bad)';
 }
+
+export const CONCEPT_LABEL: Record<string, string> = {
+  balanced: 'Balanced', lowDrag: 'Low-drag', highDownforce: 'High-downforce', tyreFriendly: 'Tyre-friendly',
+};

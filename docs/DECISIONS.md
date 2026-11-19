@@ -4,6 +4,10 @@ Record every design or technical decision here, newest first, so future sessions
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-11-19 | Parts add to the base ratings (effective car); quick stat upgrades stay | Keeps v1 R&D working; parts add choices |
+| 2026-11-19 | Engine/gearbox wear and grid penalties are per team, not per car | Half the UI, same decision |
+| 2026-11-19 | Setup is one per team (wing + suspension), hinted by a race engineer rated 50+ | Gives the engineer a visible job |
+| 2026-11-19 | Concept effect is about ±0.2 s/lap on extreme tracks; locked after round 1 | Meaningful, never decisive |
 | 2026-11-19 | Player sponsor money comes from deals (title ~60%, partners ~15% each of the league's sponsor rate); AI teams keep the position-based formula | Player gets choices; AI stays simple |
 | 2026-11-19 | Missed sponsor goal: 60% chance the sponsor leaves at season end | A miss hurts but isn't certain |
 | 2026-11-19 | Pay drivers have a negative salary in their contract | Reuses all salary code; no signing fee |

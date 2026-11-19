@@ -1,6 +1,6 @@
 # Progress
 
-**Current phase:** Phase 11 Economy and finances done. Next: Phase 12 Cars, parts and setup
+**Current phase:** Phase 12 Cars, parts and setup done. Next: Phase 13 Driver and staff development
 **Last updated:** 2026-11-19
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
@@ -89,13 +89,13 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 - [x] Finance screen: overview, balance chart with forecast, sponsors, ledger
 - [x] Optional budget cap in Prime (Finance > Overview)
 
-## Phase 12: Cars, parts and setup (Opus engine, Sonnet screens, Haiku data)
-- [ ] Car concepts with pros and cons (low-drag, high-downforce, balanced, tyre-friendly)
-- [ ] Parts with trade-offs feeding the 4 car ratings
-- [ ] Weekend setup (wing level, suspension)
-- [ ] Part wear and grid penalties
-- [ ] R&D projects that take several races
-- [ ] Balance check over 100+ races
+## Phase 12: Cars, parts and setup ✅
+- [x] Car concepts with pros and cons (low-drag, high-downforce, balanced, tyre-friendly) (`engine/car.ts`)
+- [x] Parts with trade-offs feeding the 4 car ratings (`data/parts.ts`, 7 slots)
+- [x] Weekend setup (wing level, suspension) on the Race Weekend screen
+- [x] Engine and gearbox wear, allowances and grid penalties
+- [x] R&D projects that take several races (2 at a time)
+- [x] Balance check over 120 races (`car.test.ts`)
 
 ## Phase 13: Driver and staff development (Opus engine, Sonnet screens, Haiku data)
 - [ ] Training plans and race experience
