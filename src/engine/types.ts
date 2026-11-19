@@ -226,6 +226,13 @@ export interface DriverSeasonLine {
   podiums: number;
   points: number;
   pos: number;
+  /** Overall rating at season end (Phase 14+). */
+  ovr?: number;
+  /** Best race finish (0 = never finished). */
+  best?: number;
+  /** Longest run of races in a row scoring points. */
+  streak?: number;
+  age?: number;
 }
 
 /** One staff member's season: which team and league they worked in, and where that team finished. */
@@ -234,6 +241,8 @@ export interface StaffSeasonLine {
   teamId: string;
   tier: TierId;
   teamPos: number;
+  role?: string;
+  rating?: number;
 }
 
 /** Short summary of a finished season, kept forever. */

@@ -1,7 +1,10 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
 
 export type ScreenId =
-  | 'hq' | 'drivers' | 'staff' | 'dev' | 'car' | 'finance' | 'standings' | 'race' | 'review' | 'glossary';
+  | 'hq' | 'drivers' | 'staff' | 'dev' | 'car' | 'finance' | 'standings' | 'race' | 'history' | 'review' | 'glossary' | 'profile';
+
+/** Which person or team a profile page shows. */
+export interface ProfileRef { kind: 'driver' | 'staff' | 'team'; id: string }
 
 export const SCREENS: { id: ScreenId; label: string; icon: string; blurb: string; hidden?: boolean }[] = [
   { id: 'hq', label: 'HQ Dashboard', icon: '⌂', blurb: 'Your team at a glance: next race, budget and alerts.' },
@@ -12,13 +15,19 @@ export const SCREENS: { id: ScreenId; label: string; icon: string; blurb: string
   { id: 'finance', label: 'Finance', icon: '$', blurb: 'Money in and out, sponsor deals and their goals, and a season forecast.' },
   { id: 'standings', label: 'Standings', icon: '☰', blurb: 'The race calendar and the championship tables.' },
   { id: 'race', label: 'Race Weekend', icon: '⚑', blurb: 'Qualifying, then the live race with timing tower and track map.' },
+  { id: 'history', label: 'History', icon: '🏆', blurb: 'Your team through the years, the trophy cabinet and records.' },
+  { id: 'profile', label: 'Profile', icon: '•', blurb: 'Career page.', hidden: true },
   { id: 'review', label: 'Season Review', icon: '★', blurb: 'Final tables, promotion and relegation, and contracts.', hidden: true },
   { id: 'glossary', label: 'Glossary', icon: '?', blurb: 'Every racing term explained in plain English.' },
 ];
 
 interface NavState {
   current: ScreenId;
-  go: (id: ScreenId) => void;
+  /** Profile shown when current is 'profile'. */
+  profile: ProfileRef | null;
+  go: (id: ScreenId, profile?: ProfileRef) => void;
+  /** Open a driver, staff or team career page. */
+  open: (ref: ProfileRef) => void;
   back: () => void;
   forward: () => void;
   canBack: boolean;
@@ -29,13 +38,17 @@ const NavContext = createContext<NavState | null>(null);
 
 // Simple in-app history: a list of visited screens and a pointer into it.
 export function NavProvider({ children }: { children: ReactNode }) {
-  const [hist, setHist] = useState<{ stack: ScreenId[]; i: number }>({ stack: ['hq'], i: 0 });
+  type Entry = { id: ScreenId; profile?: ProfileRef };
+  const [hist, setHist] = useState<{ stack: Entry[]; i: number }>({ stack: [{ id: 'hq' }], i: 0 });
 
-  const go = useCallback((id: ScreenId) => {
-    setHist((h) =>
-      h.stack[h.i] === id ? h : { stack: [...h.stack.slice(0, h.i + 1), id], i: h.i + 1 },
-    );
+  const go = useCallback((id: ScreenId, profile?: ProfileRef) => {
+    setHist((h) => {
+      const cur = h.stack[h.i];
+      if (cur.id === id && cur.profile?.id === profile?.id && cur.profile?.kind === profile?.kind) return h;
+      return { stack: [...h.stack.slice(0, h.i + 1), { id, profile }], i: h.i + 1 };
+    });
   }, []);
+  const open = useCallback((ref: ProfileRef) => go('profile', ref), [go]);
   const back = useCallback(() => setHist((h) => (h.i > 0 ? { ...h, i: h.i - 1 } : h)), []);
   const forward = useCallback(
     () => setHist((h) => (h.i < h.stack.length - 1 ? { ...h, i: h.i + 1 } : h)),
@@ -43,8 +56,9 @@ export function NavProvider({ children }: { children: ReactNode }) {
   );
 
   const value: NavState = {
-    current: hist.stack[hist.i],
-    go, back, forward,
+    current: hist.stack[hist.i].id,
+    profile: hist.stack[hist.i].profile ?? null,
+    go, open, back, forward,
     canBack: hist.i > 0,
     canForward: hist.i < hist.stack.length - 1,
   };

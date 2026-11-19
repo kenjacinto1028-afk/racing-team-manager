@@ -10,6 +10,7 @@ import { Rating, StatBar } from '../components/StatBar';
 import { Tip } from '../components/Tip';
 import { money, ROLE_LABEL } from '../format';
 import { usePlayer } from '../hooks';
+import { StaffLink } from '../components/Links';
 
 const EFFECT: Record<StaffRole, string> = {
   raceEngineer: 'Faster laps through better car setup.',
@@ -38,7 +39,7 @@ export function Staff() {
 
   type Row = (typeof market)[number];
   const cols: Column<Row>[] = [
-    { key: 'name', label: 'Name', sort: (r) => r.s.name, render: (r) => <b>{r.s.name}</b> },
+    { key: 'name', label: 'Name', sort: (r) => r.s.name, render: (r) => <b><StaffLink id={r.s.id} /></b> },
     { key: 'role', label: 'Role', sort: (r) => r.s.role, render: (r) => <Tip k={r.s.role}>{ROLE_LABEL[r.s.role]}</Tip> },
     { key: 'age', label: 'Age', tip: 'age', align: 'center', sort: (r) => r.s.age, render: (r) => r.s.age },
     { key: 'rating', label: 'Rating', tip: 'rating', align: 'center', sort: (r) => r.s.rating, render: (r) => <Rating v={r.s.rating} k="rating" /> },
@@ -69,7 +70,7 @@ export function Staff() {
               <div className="stat-label"><Tip k={r}>{ROLE_LABEL[r]}</Tip></div>
               {s ? (
                 <>
-                  <div className="staff-name">{s.name}</div>
+                  <div className="staff-name"><StaffLink id={s.id} /></div>
                   <StatBar label="Rating" k="rating" value={s.rating} />
                   <div className="muted small">{EFFECT[r]}</div>
                   <div className="contract-row small">

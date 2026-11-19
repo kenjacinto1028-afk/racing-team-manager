@@ -1,6 +1,6 @@
 # Progress
 
-**Current phase:** Phase 13 Driver and staff development done. Next: Phase 14 Career pages and trophies
+**Current phase:** Phase 14 Career pages and trophies done. Next: Phase 15 World records and feats
 **Last updated:** 2026-11-19
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
@@ -106,11 +106,11 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 - [x] Facilities (factory, simulator, gym; 5 levels each)
 - [x] New Development screen (Training, Youth academy, Facilities)
 
-## Phase 14: Career pages and trophies (Sonnet)
-- [ ] Driver and staff profile pages with season-by-season history
-- [ ] Trophy cabinet and personal records
-- [ ] Team history page
-- [ ] Click any name to open its profile
+## Phase 14: Career pages and trophies ✅
+- [x] Driver and staff profile pages with season-by-season history and a rating chart (`ui/screens/Profile.tsx`, `engine/careers.ts`)
+- [x] Trophy cabinet and personal records
+- [x] Team history page (History screen: your team + all past champions)
+- [x] Click any name to open its profile (Standings, HQ, Drivers, Staff, Race, Season Review)
 
 ## Phase 15: World records and feats (Sonnet, Haiku data)
 - [ ] Record book (all leagues, all seasons)

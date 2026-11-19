@@ -12,6 +12,8 @@ import { Dashboard } from './screens/Dashboard';
 import { Drivers } from './screens/Drivers';
 import { Development } from './screens/Development';
 import { Finance } from './screens/Finance';
+import { History } from './screens/History';
+import { Profile } from './screens/Profile';
 import { Glossary } from './screens/Glossary';
 import { NewGame } from './screens/NewGame';
 import { RaceWeekend } from './screens/RaceWeekend';
@@ -30,12 +32,14 @@ function screenFor(id: ScreenId): ReactNode {
     case 'standings': return <Standings />;
     case 'race': return <RaceWeekend />;
     case 'review': return <SeasonReview />;
+    case 'history': return <History />;
+    case 'profile': return <Profile />;
     case 'glossary': return <Glossary />;
   }
 }
 
 function Shell() {
-  const { current, go, back, forward, canBack, canForward } = useNav();
+  const { current, go, back, forward, canBack, canForward, profile } = useNav();
   const game = useGame((s) => s.game)!;
   const live = useGame((s) => !!s.race);
   const reset = useGame((s) => s.resetGame);
@@ -110,12 +114,12 @@ function Shell() {
         <header className="topbar" data-tour="topbar">
           <button className="nav-btn" onClick={back} disabled={!canBack} aria-label="Back" title="Back (Alt+←)">‹</button>
           <button className="nav-btn" onClick={forward} disabled={!canForward} aria-label="Forward" title="Forward (Alt+→)">›</button>
-          <span className="crumb">{screen.label}</span>
+          <span className="crumb">{screen.label}{current === 'profile' && profile ? ` · ${profile.kind === 'driver' ? (game.drivers[profile.id] ? `${game.drivers[profile.id].firstName} ${game.drivers[profile.id].lastName}` : '') : profile.kind === 'staff' ? game.staff[profile.id]?.name ?? '' : game.teams[profile.id]?.name ?? ''}` : ''}</span>
           <span className="topbar-spacer" />
           <span className="pill"><Tip k="morale" plain>Morale</Tip> <b className={team.morale < 50 ? 'bad' : team.morale >= 80 ? 'good' : ''}>{team.morale}</b></span>
           <span className="pill"><Tip k="budget" plain>Budget</Tip> <b className={team.budget < 0 ? 'bad' : ''}>{money(team.budget)}</b></span>
         </header>
-        <main className="content">{screenFor(current)}</main>
+        <main className="content" key={current + (profile ? profile.kind + profile.id : "")}>{screenFor(current)}</main>
       </div>
 
       {tour && <Tutorial onClose={closeTour} />}

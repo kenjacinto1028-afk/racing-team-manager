@@ -14,6 +14,7 @@ import { SetupPanel } from '../components/SetupPanel';
 import { unitAllowance } from '../../engine/car';
 import { FLAG, gapStr, lapTime, money, ordinal } from '../format';
 import { usePlayer } from '../hooks';
+import { DriverLink } from '../components/Links';
 import { useNav } from '../nav';
 
 /** Real seconds per lap at 1x. */
@@ -111,7 +112,7 @@ function Qualifying() {
   type Q = (typeof weekend.qualifying)[number];
   const cols: Column<Q>[] = [
     { key: 'pos', label: 'Pos', sort: (r) => r.position, render: (r) => <Pos n={r.position} />, width: 56 },
-    { key: 'driver', label: 'Driver', sort: (r) => g.drivers[r.driverId].lastName, render: (r) => { const d = g.drivers[r.driverId]; return <span>{FLAG[d.nationality]} {d.firstName} <b>{d.lastName}</b></span>; } },
+    { key: 'driver', label: 'Driver', sort: (r) => g.drivers[r.driverId].lastName, render: (r) => { const d = g.drivers[r.driverId]; return <span>{FLAG[d.nationality]} <DriverLink id={d.id} full /></span>; } },
     { key: 'team', label: 'Team', sort: (r) => g.teams[r.teamId].name, render: (r) => <TeamName team={g.teams[r.teamId]} /> },
     { key: 'time', label: 'Time', align: 'right', sort: (r) => r.time, render: (r) => <span className="mono">{lapTime(r.time)}</span> },
     { key: 'gap', label: 'Gap', tip: 'gap', align: 'right', sort: (r) => r.time, render: (r) => <span className="mono muted">{r.position === 1 ? '-' : gapStr(r.time - pole.time)}</span> },
@@ -329,7 +330,7 @@ function Results() {
   type E = (typeof res.entries)[number];
   const cols: Column<E>[] = [
     { key: 'pos', label: 'Pos', sort: (r) => r.position, render: (r) => (r.dnf ? <span className="pos">-</span> : <Pos n={r.position} />), width: 56 },
-    { key: 'driver', label: 'Driver', sort: (r) => g.drivers[r.driverId].lastName, render: (r) => <b>{g.drivers[r.driverId].firstName} {g.drivers[r.driverId].lastName}</b> },
+    { key: 'driver', label: 'Driver', sort: (r) => g.drivers[r.driverId].lastName, render: (r) => <DriverLink id={r.driverId} full /> },
     { key: 'team', label: 'Team', sort: (r) => g.teams[r.teamId].name, render: (r) => <TeamName team={g.teams[r.teamId]} /> },
     { key: 'grid', label: 'Grid', tip: 'grid', align: 'center', sort: (r) => r.grid, render: (r) => { const d = r.grid - r.position; return <span>{r.grid} {!r.dnf && d !== 0 && <span className={d > 0 ? 'good small' : 'bad small'}>{d > 0 ? `▲${d}` : `▼${-d}`}</span>}</span>; } },
     { key: 'stops', label: 'Stops', tip: 'pitStop', align: 'center', sort: (r) => r.pitStops, render: (r) => r.pitStops },

@@ -4,6 +4,14 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-19: Phase 14 Career pages and trophies
+- Profile pages for drivers, staff and teams: current stats, rating-by-season chart, season-by-season table (live season included), personal records (titles, wins, podiums, points, best finish, best season, points streak), trophy cabinet.
+- History screen: your team's seasons and trophies (league titles, promotions, drivers' titles) plus a Champions table for every league and season.
+- Names are clickable across the game; Back/Forward work between profiles.
+- Season archive now also stores each driver's rating, best finish, points streak and age, and each staff member's rating (older archives just show less).
+- 102 tests pass; browser check, no console errors.
+- **Next:** Phase 15 World records and feats.
+
 ## 2026-11-19: Phase 13 Driver and staff development
 - Training: pick a focus per driver (pace, racecraft, tyres, fitness, balanced). Each race a chance of +1, faster when young, slower near potential. Race experience grows too.
 - Traits (8): tyre whisperer, strong starter, hot-headed, qualifying ace, street specialist, calm, mechanical sympathy, fast learner. ~30% of drivers start with one; more come after good seasons.

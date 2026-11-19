@@ -9,6 +9,7 @@ import { Rating } from '../components/StatBar';
 import { Tip } from '../components/Tip';
 import { money, ordinal, ROLE_LABEL } from '../format';
 import { usePlayer } from '../hooks';
+import { DriverLink, TeamLink } from '../components/Links';
 import { goalProgress } from '../../engine/sponsors';
 import { useNav } from '../nav';
 
@@ -79,7 +80,7 @@ export function SeasonReview() {
                 return (
                   <tr key={r.id} className={(r.id === team.id ? 'me ' : '') + (movesUp ? 'zone-up' : movesDown ? 'zone-down' : '')}>
                     <td style={{ width: 44 }}><Pos n={i + 1} /></td>
-                    <td><TeamName team={g.teams[r.id]} /></td>
+                    <td><TeamLink id={r.id}><TeamName team={g.teams[r.id]} /></TeamLink></td>
                     <td className="muted small">{r.wins} wins</td>
                     <td style={{ textAlign: 'right' }}><b>{r.points}</b> pts</td>
                     <td style={{ width: 120, textAlign: 'right' }}>
@@ -93,7 +94,7 @@ export function SeasonReview() {
           </table>
           {champ && (
             <p className="muted small" style={{ marginTop: 12 }}>
-              Drivers' champion: <b>{g.drivers[champ.id].firstName} {g.drivers[champ.id].lastName}</b> ({g.teams[champ.teamId].name}) with {champ.points} points.
+              Drivers' champion: <DriverLink id={champ.id} full /> ({g.teams[champ.teamId].name}) with {champ.points} points.
             </p>
           )}
         </section>

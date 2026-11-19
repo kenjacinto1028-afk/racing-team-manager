@@ -13,6 +13,7 @@ import { MoraleBar, TraitChips } from './Development';
 import { potentialRange } from '../../engine/scouting';
 import { FLAG, money } from '../format';
 import { usePlayer } from '../hooks';
+import { DriverLink } from '../components/Links';
 
 const STATS: { k: keyof Driver & string; label: string }[] = [
   { k: 'pace', label: 'Pace' },
@@ -66,7 +67,7 @@ export function Drivers() {
 
   type Row = (typeof market)[number];
   const cols: Column<Row>[] = [
-    { key: 'name', label: 'Driver', sort: (r) => r.d.lastName, render: (r) => <span>{FLAG[r.d.nationality]} <b>{r.d.firstName} {r.d.lastName}</b> <TraitChips d={r.d} />{r.d.payBudget ? <Tip k="payDriver" plain><span className="badge badge-pay">Pay</span></Tip> : null}</span> },
+    { key: 'name', label: 'Driver', sort: (r) => r.d.lastName, render: (r) => <span>{FLAG[r.d.nationality]} <DriverLink id={r.d.id} full /> <TraitChips d={r.d} />{r.d.payBudget ? <Tip k="payDriver" plain><span className="badge badge-pay">Pay</span></Tip> : null}</span> },
     { key: 'age', label: 'Age', tip: 'age', align: 'center', sort: (r) => r.d.age, render: (r) => r.d.age },
     { key: 'ovr', label: 'OVR', tip: 'overall', align: 'center', sort: (r) => r.ovr, render: (r) => <Rating v={r.ovr} k="overall" /> },
     { key: 'pace', label: 'PAC', tip: 'pace', align: 'center', sort: (r) => r.d.pace, render: (r) => r.d.pace },
@@ -109,7 +110,7 @@ export function Drivers() {
               <section key={d.id} className="card driver-card" style={{ ['--team' as string]: team.colors.primary }}>
                 <div className="driver-head">
                   <div>
-                    <div className="driver-name">{d.firstName} <b>{d.lastName}</b></div>
+                    <div className="driver-name"><DriverLink id={d.id}>{d.firstName} <b>{d.lastName}</b></DriverLink></div>
                     <div className="muted small">{FLAG[d.nationality]} · Age {d.age} · <Tip k="potential">Potential</Tip> {potStr(d)}{d.payBudget ? <Tip k="payDriver" plain><span className="badge badge-pay">Pay driver</span></Tip> : null} <TraitChips d={d} /></div>
                   </div>
                   <div className="ovr-badge"><Tip k="overall" plain>{driverOverall(d)}</Tip><span>OVR</span></div>

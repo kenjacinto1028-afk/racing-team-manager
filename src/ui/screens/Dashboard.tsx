@@ -10,6 +10,7 @@ import { Tip } from '../components/Tip';
 import { TrackProfile } from '../components/TrackProfile';
 import { FLAG, money, ordinal, ROLE_LABEL } from '../format';
 import { usePlayer } from '../hooks';
+import { DriverLink, TeamLink } from '../components/Links';
 import { useNav } from '../nav';
 
 export function Dashboard() {
@@ -113,7 +114,7 @@ export function Dashboard() {
               {snapshot.map(({ r, i }) => (
                 <tr key={r.id} className={(r.id === team.id ? 'me ' : '') + zone(i)}>
                   <td style={{ width: 40 }}>{round === 0 ? <span className="pos">-</span> : <Pos n={i + 1} />}</td>
-                  <td><TeamName team={g.teams[r.id]} /></td>
+                  <td><TeamLink id={r.id}><TeamName team={g.teams[r.id]} /></TeamLink></td>
                   <td style={{ textAlign: 'right' }}><b>{r.points}</b> pts</td>
                 </tr>
               ))}
@@ -140,7 +141,7 @@ export function Dashboard() {
             const d = g.drivers[id];
             return (
               <div key={id} className="list-row">
-                <span>{FLAG[d.nationality]} <b>{d.firstName} {d.lastName}</b> <span className="muted">· {d.age}</span></span>
+                <span>{FLAG[d.nationality]} <DriverLink id={d.id} full /> <span className="muted">· {d.age}</span></span>
                 <span className="muted small"><Tip k="contract">{d.contract?.yearsLeft ?? 0} yr</Tip> · {money(d.contract?.salary ?? 0)}/race</span>
                 <Rating v={driverOverall(d)} k="overall" />
               </div>

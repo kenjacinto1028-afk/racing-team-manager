@@ -8,6 +8,7 @@ import { DataTable, type Column } from '../components/DataTable';
 import { Tip } from '../components/Tip';
 import { FLAG } from '../format';
 import { usePlayer } from '../hooks';
+import { DriverLink, TeamLink } from '../components/Links';
 
 type Tab = 'teams' | 'drivers' | 'calendar';
 
@@ -29,15 +30,15 @@ export function Standings() {
   type TRow = StandingRow & { pos: number };
   const teamCols: Column<TRow>[] = [
     { key: 'pos', label: 'Pos', tip: 'position', sort: (r) => r.pos, render: (r) => <Pos n={r.pos} />, width: 56 },
-    { key: 'team', label: 'Team', sort: (r) => g.teams[r.id].name, render: (r) => <TeamName team={g.teams[r.id]} /> },
+    { key: 'team', label: 'Team', sort: (r) => g.teams[r.id].name, render: (r) => <TeamLink id={r.id}><TeamName team={g.teams[r.id]} /></TeamLink> },
     { key: 'wins', label: 'Wins', tip: 'wins', align: 'center', sort: (r) => r.wins, render: (r) => r.wins },
     { key: 'pod', label: 'Podiums', tip: 'podium', align: 'center', sort: (r) => r.podiums, render: (r) => r.podiums },
     { key: 'pts', label: 'Points', tip: 'points', align: 'right', sort: (r) => r.points, render: (r) => <b>{r.points}</b> },
   ];
   const driverCols: Column<TRow>[] = [
     { key: 'pos', label: 'Pos', tip: 'position', sort: (r) => r.pos, render: (r) => <Pos n={r.pos} />, width: 56 },
-    { key: 'driver', label: 'Driver', sort: (r) => g.drivers[r.id].lastName, render: (r) => { const d = g.drivers[r.id]; return <span>{FLAG[d.nationality]} {d.firstName} <b>{d.lastName}</b></span>; } },
-    { key: 'team', label: 'Team', sort: (r) => g.teams[r.teamId].name, render: (r) => <TeamName team={g.teams[r.teamId]} short /> },
+    { key: 'driver', label: 'Driver', sort: (r) => g.drivers[r.id].lastName, render: (r) => { const d = g.drivers[r.id]; return <span>{FLAG[d.nationality]} <DriverLink id={d.id} full /></span>; } },
+    { key: 'team', label: 'Team', sort: (r) => g.teams[r.teamId].name, render: (r) => <TeamLink id={r.teamId}><TeamName team={g.teams[r.teamId]} short /></TeamLink> },
     { key: 'wins', label: 'Wins', tip: 'wins', align: 'center', sort: (r) => r.wins, render: (r) => r.wins },
     { key: 'pod', label: 'Podiums', tip: 'podium', align: 'center', sort: (r) => r.podiums, render: (r) => r.podiums },
     { key: 'pts', label: 'Points', tip: 'points', align: 'right', sort: (r) => r.points, render: (r) => <b>{r.points}</b> },
@@ -94,7 +95,7 @@ export function Standings() {
                     <td className="muted">Wk {L.weeks[i]}</td>
                     <td><b>{t.name}</b> <span className="muted small">{t.country}</span></td>
                     <td>{t.laps}</td>
-                    <td>{win ? <span>{g.drivers[win.driverId].lastName} <span className="muted small">({g.teams[win.teamId].short})</span></span> : i === L.results.length ? <span className="tag">Next</span> : <span className="muted">-</span>}</td>
+                    <td>{win ? <span><DriverLink id={win.driverId} /> <span className="muted small">({g.teams[win.teamId].short})</span></span> : i === L.results.length ? <span className="tag">Next</span> : <span className="muted">-</span>}</td>
                     <td>{tier === myTier ? (mine ? (mine.dnf ? 'DNF' : `P${mine.position}`) : '-') : pole ? g.drivers[pole.driverId].lastName : '-'}</td>
                   </tr>
                 );

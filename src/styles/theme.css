@@ -554,3 +554,19 @@ tr.slot-first td { border-top: 1px solid var(--border-strong); }
 .level-pips { display: flex; gap: 6px; margin: 4px 0 8px; }
 .level-pips i { flex: 1; height: 6px; border-radius: 3px; background: var(--surface-2); border: 1px solid var(--border); }
 .level-pips i.on { background: var(--accent); border-color: var(--accent); }
+
+/* ---- Careers (Phase 14) ---- */
+.name-link { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; text-align: left; border-bottom: 1px dotted transparent; }
+.name-link:hover, .name-link:focus-visible { color: var(--text); border-bottom-color: var(--accent); outline: none; }
+.profile-hero { display: flex; align-items: center; gap: var(--s-5); }
+.profile-avatar { width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--team, var(--accent)) 55%, var(--team2, #fff) 55%); border: 2px solid var(--border-strong); flex: none; }
+.trophy-shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--s-3); }
+.trophy { display: flex; flex-direction: column; gap: 4px; padding: var(--s-3) var(--s-4); border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); }
+.trophy .ic { font-size: 22px; }
+.trophy b { font-size: 13px; }
+.trophy.title { border-color: #d4af37; }
+.trophy.teamTitle { border-color: #d4af37; background: color-mix(in srgb, #d4af37 8%, var(--surface-2)); }
+.trophy.promotion { border-color: var(--good); }
+.rec-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-3); }
+.rec { padding: var(--s-3); border-radius: 10px; background: var(--surface-2); }
+.rec .stat-value { font-size: 26px; }
