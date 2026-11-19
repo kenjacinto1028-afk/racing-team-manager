@@ -4,6 +4,7 @@ Record every design or technical decision here, newest first, so future sessions
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-11-19 | Hosted on GitHub Pages, deployed by GitHub Actions on every push to `main` | Free, public play link that updates itself |
 | 2026-11-19 | Tooltips open on hover or keyboard focus only (not mouse click) | Stops tooltips sticking open on buttons |
 | 2026-11-19 | Below 1200 px wide, wide tables scroll inside their card | Keeps the page itself from scrolling sideways at 1024 px |
 | 2026-11-19 | Each driver gets a random "weekend form" (±~0.3 s/lap) shared by qualifying and the race | Underdogs can win on their day; seasons aren't decided by the grid alone |

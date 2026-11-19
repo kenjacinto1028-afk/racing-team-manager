@@ -2,6 +2,7 @@
 
 **Current phase:** v1 complete. Next: playtest, then pick items from "Later" in PLAN.md
 **Last updated:** 2026-11-19
+**Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
 Tick each box when it's done. Update "Current phase" and add an entry to `docs/SESSION_LOG.md` at the end of each session.
 

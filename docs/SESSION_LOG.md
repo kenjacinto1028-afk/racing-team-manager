@@ -4,6 +4,12 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-19: Published online
+- Game pushed to GitHub (`kenjacinto1028-afk/racing-team-manager`) and published with GitHub Pages: https://kenjacinto1028-afk.github.io/racing-team-manager/
+- `.github/workflows/deploy.yml` runs the tests, builds and deploys on every push to `main`. Vite `base` is `./` so it works under the Pages sub-path.
+- Also published a private Claude link (single-file build in `play/racing-team-manager.html`): https://claude.ai/artifact/Nxc8j3XmR8xqzrBMDf91JX
+- **Next:** playtest and tune balance.
+
 ## 2026-11-19: Phase 8 Teach and polish
 - Glossary screen (search + category tabs, 60 terms). Tooltip sweep: ratings, KPIs, staff "vs yours", race controls. Alt+←/→ for back/forward. Favicon, page fade-in, reduced-motion support.
 - Fixed: hidden tooltips caused sideways scrolling; tooltips stuck open after clicking; layout at 1024 px (tables scroll inside their card).
