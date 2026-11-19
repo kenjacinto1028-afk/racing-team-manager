@@ -4,6 +4,12 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-19: Tutorial and tooltip gaps
+- Added a 10-step guided tour (`src/ui/components/Tutorial.tsx`, steps in `src/data/tutorial.ts`). Shows on first launch, can be skipped, replayed with "Replay tutorial" in the sidebar. "Seen" flag lives in its own localStorage key, so the save shape and `saveVersion` are unchanged.
+- Filled tooltip gaps: race controls, commentary, tyre cliff, Pos/Age headings, sidebar hover hints; 7 new glossary entries.
+- 55 tests pass, no console errors in the browser. Not pushed yet (waiting for approval).
+- **Next:** push after approval, then playtest and balance.
+
 ## 2026-11-19: Published online
 - Game pushed to GitHub (`kenjacinto1028-afk/racing-team-manager`) and published with GitHub Pages: https://kenjacinto1028-afk.github.io/racing-team-manager/
 - `.github/workflows/deploy.yml` runs the tests, builds and deploys on every push to `main`. Vite `base` is `./` so it works under the Pages sub-path.

@@ -1,6 +1,6 @@
 # Progress
 
-**Current phase:** v1 complete. Next: playtest, then pick items from "Later" in PLAN.md
+**Current phase:** v1 complete + tutorial added. Next: playtest, then pick items from "Later" in PLAN.md
 **Last updated:** 2026-11-19
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
@@ -68,6 +68,10 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 - [x] Tooltips on every stat and term
 - [x] Visual polish pass (premium look)
 - [x] Full browser playthrough with no console errors
+
+## Phase 9: Tutorial and tooltip gaps ✅
+- [x] 10-step guided tour (skippable, replay from sidebar, Esc / arrow keys)
+- [x] Tooltips: race controls (pause, speed, skip, driver mode, commentary, tyre cliff), Pos and Age headings, sidebar hints
 
 ---
 

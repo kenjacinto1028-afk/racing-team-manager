@@ -28,14 +28,14 @@ export function Standings() {
 
   type TRow = StandingRow & { pos: number };
   const teamCols: Column<TRow>[] = [
-    { key: 'pos', label: 'Pos', sort: (r) => r.pos, render: (r) => <Pos n={r.pos} />, width: 56 },
+    { key: 'pos', label: 'Pos', tip: 'position', sort: (r) => r.pos, render: (r) => <Pos n={r.pos} />, width: 56 },
     { key: 'team', label: 'Team', sort: (r) => g.teams[r.id].name, render: (r) => <TeamName team={g.teams[r.id]} /> },
     { key: 'wins', label: 'Wins', tip: 'wins', align: 'center', sort: (r) => r.wins, render: (r) => r.wins },
     { key: 'pod', label: 'Podiums', tip: 'podium', align: 'center', sort: (r) => r.podiums, render: (r) => r.podiums },
     { key: 'pts', label: 'Points', tip: 'points', align: 'right', sort: (r) => r.points, render: (r) => <b>{r.points}</b> },
   ];
   const driverCols: Column<TRow>[] = [
-    { key: 'pos', label: 'Pos', sort: (r) => r.pos, render: (r) => <Pos n={r.pos} />, width: 56 },
+    { key: 'pos', label: 'Pos', tip: 'position', sort: (r) => r.pos, render: (r) => <Pos n={r.pos} />, width: 56 },
     { key: 'driver', label: 'Driver', sort: (r) => g.drivers[r.id].lastName, render: (r) => { const d = g.drivers[r.id]; return <span>{FLAG[d.nationality]} {d.firstName} <b>{d.lastName}</b></span>; } },
     { key: 'team', label: 'Team', sort: (r) => g.teams[r.teamId].name, render: (r) => <TeamName team={g.teams[r.teamId]} short /> },
     { key: 'wins', label: 'Wins', tip: 'wins', align: 'center', sort: (r) => r.wins, render: (r) => r.wins },

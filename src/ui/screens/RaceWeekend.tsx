@@ -185,11 +185,11 @@ function LiveRace({ race, g, team }: { race: RaceState; g: GameState; team: Team
         <div className="race-controls">
           {!race.finished && (
             <>
-              <button className="btn btn-sm" onClick={() => setPaused(!paused)}>{paused ? '▶ Resume' : '❚❚ Pause'}</button>
-              <div className="seg">
+              <button className="btn btn-sm" onClick={() => setPaused(!paused)}><Tip k="pause" plain>{paused ? '▶ Resume' : '❚❚ Pause'}</Tip></button>
+              <div className="seg" title="Race speed: how fast the race plays">
                 {([1, 4, 16] as RaceSpeed[]).map((s) => <button key={s} className={speed === s ? 'on' : ''} onClick={() => setSpeed(s)}>{s}×</button>)}
               </div>
-              <button className="btn btn-sm" onClick={skip}>Skip to end ⏭</button>
+              <button className="btn btn-sm" onClick={skip}><Tip k="skipRace" plain>Skip to end ⏭</Tip></button>
             </>
           )}
           {race.finished && <button className="btn btn-primary btn-lg" onClick={() => finish()}>Results & payout ›</button>}
@@ -210,7 +210,7 @@ function LiveRace({ race, g, team }: { race: RaceState; g: GameState; team: Team
         {mine.map((car) => <PitWall key={car.c.driverId} car={car} race={race} position={order(race.cars).indexOf(car) + 1} />)}
         <section className="card feed-card">
           <div className="card-head">
-            <h3>Commentary</h3>
+            <h3><Tip k="commentary">Commentary</Tip></h3>
             <div className="seg seg-sm">
               <button className={!feedMine ? 'on' : ''} onClick={() => setFeedMine(false)}>All</button>
               <button className={feedMine ? 'on' : ''} onClick={() => setFeedMine(true)}>My team</button>
@@ -256,11 +256,11 @@ function PitWall({ car, race, position }: { car: RaceCar; race: RaceState; posit
               <span><TyreBadge c={car.tyre.compound} age={car.tyre.age} /> <Tip k="wear">Tyre wear</Tip></span>
               <span className="statbar-value">{Math.round(car.tyre.wear)}%</span>
             </div>
-            <div className="statbar-track"><i style={{ width: `${Math.min(100, car.tyre.wear)}%`, background: wearColor }} /><span className="statbar-mark" style={{ left: '70%' }} title="Tyre cliff (70%)" /></div>
+            <div className="statbar-track"><i style={{ width: `${Math.min(100, car.tyre.wear)}%`, background: wearColor }} /><span className="statbar-mark" style={{ left: '70%' }} title="Tyre cliff: past 70% tyres lose lots of grip" /></div>
             <div className="muted small" style={{ marginTop: 6 }}>About {lapsLeftOnTyre} good laps left · {lapsLeft} laps to go</div>
             {car.tyre.wear >= 70 && !car.pitRequest && <div className="tyre-alert">Tyres are past the cliff and losing seconds a lap. Pit now!</div>}
           </div>
-          <div className="pitwall-label">Driver mode</div>
+          <div className="pitwall-label"><Tip k="driverMode">Driver mode</Tip></div>
           <div className="seg full">
             {MODES.map((m) => (
               <button key={m} disabled={disabled} className={car.mode === m ? 'on' : ''} onClick={() => setMode(car.c.driverId, m)}>

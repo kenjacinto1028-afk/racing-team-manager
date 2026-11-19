@@ -36,7 +36,7 @@ export function Staff() {
   const cols: Column<Row>[] = [
     { key: 'name', label: 'Name', sort: (r) => r.s.name, render: (r) => <b>{r.s.name}</b> },
     { key: 'role', label: 'Role', sort: (r) => r.s.role, render: (r) => <Tip k={r.s.role}>{ROLE_LABEL[r.s.role]}</Tip> },
-    { key: 'age', label: 'Age', align: 'center', sort: (r) => r.s.age, render: (r) => r.s.age },
+    { key: 'age', label: 'Age', tip: 'age', align: 'center', sort: (r) => r.s.age, render: (r) => r.s.age },
     { key: 'rating', label: 'Rating', tip: 'rating', align: 'center', sort: (r) => r.s.rating, render: (r) => <Rating v={r.s.rating} k="rating" /> },
     {
       key: 'vs', label: 'Vs yours', tip: 'vsYours', align: 'center', sort: (r) => r.s.rating - (g.staff[team.staffIds[r.s.role] ?? '']?.rating ?? 0),

@@ -1,8 +1,10 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { LEAGUES } from '../data/leagues';
 import { seasonOver, useGame } from '../store/gameStore';
 import { ConfirmButton } from './components/bits';
 import { Tip } from './components/Tip';
+import { Tutorial } from './components/Tutorial';
+import { TOUR_KEY } from '../data/tutorial';
 import { money } from './format';
 import { NavProvider, SCREENS, useNav, type ScreenId } from './nav';
 import { Car } from './screens/Car';
@@ -33,6 +35,13 @@ function Shell() {
   const game = useGame((s) => s.game)!;
   const live = useGame((s) => !!s.race);
   const reset = useGame((s) => s.resetGame);
+  const [tour, setTour] = useState(() => {
+    try { return !localStorage.getItem(TOUR_KEY); } catch { return false; }
+  });
+  const closeTour = () => {
+    setTour(false);
+    try { localStorage.setItem(TOUR_KEY, '1'); } catch { /* ignore */ }
+  };
   const screen = SCREENS.find((s) => s.id === current)!;
   const team = game.teams[game.playerTeamId];
   const over = seasonOver(game);
@@ -74,6 +83,8 @@ function Shell() {
           {SCREENS.filter((s) => !s.hidden || (s.id === 'review' && over)).map((s) => (
             <button
               key={s.id}
+              data-tour={`nav-${s.id}`}
+              title={s.blurb}
               className={'nav-item' + (s.id === current ? ' active' : '')}
               onClick={() => go(s.id)}
               aria-current={s.id === current ? 'page' : undefined}
@@ -86,12 +97,13 @@ function Shell() {
         </nav>
         <div className="sidebar-foot">
           <div>Season {game.season} · {game.year}</div>
+          <button className="btn btn-ghost btn-sm" onClick={() => setTour(true)}>Replay tutorial</button>
           <ConfirmButton className="btn btn-ghost btn-sm" confirmText="Erase save?" onConfirm={reset}>New game</ConfirmButton>
         </div>
       </aside>
 
       <div className="main">
-        <header className="topbar">
+        <header className="topbar" data-tour="topbar">
           <button className="nav-btn" onClick={back} disabled={!canBack} aria-label="Back" title="Back (Alt+←)">‹</button>
           <button className="nav-btn" onClick={forward} disabled={!canForward} aria-label="Forward" title="Forward (Alt+→)">›</button>
           <span className="crumb">{screen.label}</span>
@@ -100,6 +112,8 @@ function Shell() {
         </header>
         <main className="content">{screenFor(current)}</main>
       </div>
+
+      {tour && <Tutorial onClose={closeTour} />}
 
       {game.finance.bankrupt && (
         <div className="overlay">

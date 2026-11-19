@@ -72,6 +72,13 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
   pointsBonus: { term: 'Points bonus', category: 'Money', short: 'Extra sponsor money for every championship point scored.' },
   prizeMoney: { term: 'Prize money', category: 'Money', short: 'Paid at the end of the season by final team position.' },
   bankruptcy: { term: 'Bankruptcy', category: 'Money', short: 'Game over: the budget was below zero after 2 races in a row.' },
+  raceSpeed: { term: 'Race speed', category: 'Racing', short: 'How fast the live race plays. 1× is slowest, 16× is fastest. You can change it any time.' },
+  skipRace: { term: 'Skip to end', category: 'Racing', short: 'Jump straight to the chequered flag. Your drivers keep their current mode and tyres, with no more pit calls from you.' },
+  pause: { term: 'Pause', category: 'Racing', short: 'Freeze the race so you can think. Pit and mode calls still work while paused.' },
+  cliff: { term: 'Tyre cliff', category: 'Racing', short: 'At about 70% wear tyres suddenly lose lots of grip and lap times drop sharply. Pit before you reach it.' },
+  commentary: { term: 'Commentary', category: 'Racing', short: 'A running list of race events: overtakes, pit stops and crashes. "My team" shows only your cars.' },
+  driverMode: { term: 'Driver mode', category: 'Racing', short: 'How hard the driver pushes: Push is faster but wears tyres, Conserve saves tyres, Normal is balanced.' },
+  position: { term: 'Pos', category: 'Season', short: 'Position: where you are in the order. 1 is first.' },
 };
 
 export function gloss(key: string): GlossaryEntry | undefined {
