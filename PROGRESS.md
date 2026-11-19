@@ -1,6 +1,6 @@
 # Progress
 
-**Current phase:** Phases 10-16 done (on the work branch). Next: push to the live game once approved
+**Current phase:** Phases 10-16 done and live. Next: nothing planned; see the "Later" ideas in docs/ROADMAP.md
 **Last updated:** 2026-11-19
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
