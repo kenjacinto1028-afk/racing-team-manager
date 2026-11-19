@@ -54,8 +54,8 @@ describe('season history', () => {
       expect(lines.length).toBeGreaterThanOrEqual(20);
       expect(lines.reduce((a, d) => a + d.wins, 0)).toBe(done.leagues[t].results.length);
     }
-    // 10 teams x 3 tiers x 4 roles.
-    expect(h.staff).toHaveLength(120);
+    // 10 teams x 3 tiers x 5 roles.
+    expect(h.staff).toHaveLength(150);
   });
 
   it('keeps growing across seasons and career helpers read it', () => {

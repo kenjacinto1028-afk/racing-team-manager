@@ -2,12 +2,14 @@ import { create } from 'zustand';
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 import { buyUpgrade as engineBuyUpgrade } from '../engine/finance';
 import { generateWorld, type PlayerSetup } from '../engine/generate';
-import { hireDriver as engineHireDriver, hireStaff as engineHireStaff, releaseDriver as engineReleaseDriver } from '../engine/market';
+import { hireDriver as engineHireDriver, hireStaff as engineHireStaff, negotiate, releaseDriver as engineReleaseDriver, releaseStaff as engineReleaseStaff, type ContractOffer, type TalkReply } from '../engine/market';
+import { signSponsor as engineSignSponsor } from '../engine/sponsors';
+import { fitPart as engineFitPart, replaceUnit as engineReplaceUnit, setConcept as engineSetConcept, startProject as engineStartProject } from '../engine/car';
 import { previewReview, renewContract as engineRenew, runOffseason, syncOtherLeagues, type SeasonReview } from '../engine/offseason';
 import { applyOrder, raceToResult, simulateToEnd, stepLap, type RaceState } from '../engine/raceSim';
 import { completeRace, prepareWeekend, startRace as engineStartRace, type Weekend } from '../engine/raceSetup';
 import { isLeagueComplete } from '../engine/season';
-import type { CarStat, Compound, DriverMode, GameState, RaceResult, TierId } from '../engine/types';
+import type { CarConcept, CarSetup, CarStat, Compound, DriverMode, GameState, RaceResult, TierId, UnitKind } from '../engine/types';
 
 import { migrateSave, SAVE_VERSION } from './migrations';
 
@@ -42,6 +44,16 @@ export interface GameStore extends Data {
   hireDriver: (driverId: string, years?: number) => ActionResult;
   releaseDriver: (driverId: string) => ActionResult;
   hireStaff: (staffId: string, years?: number) => ActionResult;
+  releaseStaff: (staffId: string) => ActionResult;
+  /** Make a contract offer. On 'accept' the driver is signed straight away. */
+  offerContract: (driverId: string, offer: ContractOffer) => TalkReply | { kind: 'error'; note: string };
+  signSponsor: (offerId: string) => ActionResult;
+  setBudgetCap: (on: boolean) => void;
+  setConcept: (c: CarConcept) => ActionResult;
+  startProject: (partId: string) => ActionResult;
+  fitPart: (partId: string) => ActionResult;
+  replaceUnit: (kind: UnitKind) => ActionResult;
+  setSetup: (setup: CarSetup) => void;
   buyUpgrade: (stat: CarStat) => ActionResult;
   /** Run qualifying for the player's next race. */
   prepareRace: () => ActionResult;
@@ -107,6 +119,31 @@ export function createGameStore(storage?: StateStorage, name = 'rtm-save') {
           hireDriver: (id, years) => withGame((g) => engineHireDriver(g, g.playerTeamId, id, years)),
           releaseDriver: (id) => withGame((g) => engineReleaseDriver(g, g.playerTeamId, id)),
           hireStaff: (id, years) => withGame((g) => engineHireStaff(g, g.playerTeamId, id, years)),
+          releaseStaff: (id) => withGame((g) => engineReleaseStaff(g, g.playerTeamId, id)),
+          offerContract: (id, offer) => {
+            const g = get().game;
+            if (!g) return { kind: 'error', note: 'No game in progress' };
+            if (get().race) return { kind: 'error', note: 'Not during a race' };
+            const reply = negotiate(g, g.playerTeamId, id, offer);
+            if (reply.kind !== 'accept') return reply;
+            const r = engineHireDriver(g, g.playerTeamId, id, offer.years, false, offer);
+            if (!r.ok) return { kind: 'error', note: r.reason };
+            set({ game: r.state });
+            return reply;
+          },
+          signSponsor: (offerId) => withGame((g) => engineSignSponsor(g, offerId)),
+          setConcept: (c) => withGame((g) => engineSetConcept(g, c)),
+          startProject: (id) => withGame((g) => engineStartProject(g, g.playerTeamId, id)),
+          fitPart: (id) => withGame((g) => engineFitPart(g, g.playerTeamId, id)),
+          replaceUnit: (kind) => withGame((g) => engineReplaceUnit(g, g.playerTeamId, kind)),
+          setSetup: (setup) => {
+            const g = get().game;
+            if (g && !get().weekend) set({ game: { ...g, setup } });
+          },
+          setBudgetCap: (on) => {
+            const g = get().game;
+            if (g) set({ game: { ...g, settings: { ...g.settings, budgetCap: on } } });
+          },
           buyUpgrade: (stat) => withGame((g) => engineBuyUpgrade(g, g.playerTeamId, stat)),
 
           prepareRace: () => {

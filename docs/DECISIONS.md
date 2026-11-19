@@ -4,6 +4,12 @@ Record every design or technical decision here, newest first, so future sessions
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-11-19 | Player sponsor money comes from deals (title ~60%, partners ~15% each of the league's sponsor rate); AI teams keep the position-based formula | Player gets choices; AI stays simple |
+| 2026-11-19 | Missed sponsor goal: 60% chance the sponsor leaves at season end | A miss hurts but isn't certain |
+| 2026-11-19 | Pay drivers have a negative salary in their contract | Reuses all salary code; no signing fee |
+| 2026-11-19 | Drivers accept offers worth 98%+ of their ask, counter from 80%, refuse below; bonuses valued by expected win/podium rate | Simple, readable talks |
+| 2026-11-19 | Budget cap is off by default, Prime only, $15M of R&D and signing fees per season, applies to AI too | Optional, matches real top-level racing |
+| 2026-11-19 | Team morale (20-95) is team-wide for now; driver morale comes in Phase 13 | Firing needed a cost now |
 | 2026-11-19 | Owner approved Phases 10-16. Always use the model that spends the fewest tokens for each step | Owner's choice |
 | 2026-11-19 | Once Phase 16 is built, new games start in tier 5 (Formula Rookie); existing saves keep their tier | Longer climb to the top |
 | 2026-11-19 | Phase 16: expand to a 5-tier ladder (new Formula Regional and Formula Rookie below Academy) and add side championships for tiers 3-5 only. Replaces the 3-tier rule once built | Owner's choice: a longer climb plus extra events for junior teams |

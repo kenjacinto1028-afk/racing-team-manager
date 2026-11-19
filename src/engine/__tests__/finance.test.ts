@@ -4,6 +4,7 @@ import {
   applyPrizeMoney, applyRaceFinances, buyUpgrade, raceSalaries, sponsorIncome, upgradeCost, upgradeGain,
 } from '../finance';
 import { recordResult, teamStandings } from '../season';
+import { sponsorPerRace } from '../sponsors';
 import type { GameState } from '../types';
 import { fakeResult, world } from './helpers';
 
@@ -17,11 +18,11 @@ describe('finance', () => {
     expect(sponsorIncome(1, 5)).toBeGreaterThan(sponsorIncome(3, 5));
   });
 
-  it('race payout = sponsor + points bonus - salaries', () => {
+  it('race payout = sponsor deals + points bonus - salaries', () => {
     const s0 = world();
     const order = [s0.playerTeamId, ...s0.leagues[3].teamIds.filter((id) => id !== s0.playerTeamId)];
     const s1 = raceOnce(s0, order, 1);
-    const expected = s0.teams[s0.playerTeamId].budget + sponsorIncome(3, 1) + 43 * LEAGUES[3].pointBonus - raceSalaries(s0, s0.playerTeamId);
+    const expected = s0.teams[s0.playerTeamId].budget + sponsorPerRace(s0) + 43 * LEAGUES[3].pointBonus - raceSalaries(s0, s0.playerTeamId);
     expect(s1.teams[s1.playerTeamId].budget).toBe(expected);
     const net = s1.finance.ledger.reduce((a, e) => a + e.amount, 0);
     expect(net).toBe(expected - s0.teams[s0.playerTeamId].budget);

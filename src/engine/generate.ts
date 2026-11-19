@@ -2,11 +2,13 @@ import { LEAGUES, TEAMS_PER_TIER, TIERS, STARTING_TIER, DRIVERS_PER_TEAM } from 
 import { NATIONS, STAFF_FIRST, STAFF_LAST, TEAM_NAMES } from '../data/names';
 import { TRACKS } from '../data/tracks';
 import { clamp, createRng, hashSeed, type Rng } from './rng';
+import { initialSponsors } from './sponsors';
+import { defaultCarFields } from './car';
 import type {
   CarStats, Driver, GameState, LeagueState, Staff, StaffRole, Team, TierId,
 } from './types';
 
-export const STAFF_ROLES: StaffRole[] = ['raceEngineer', 'chiefMechanic', 'pitCrewChief', 'technicalDirector'];
+export const STAFF_ROLES: StaffRole[] = ['raceEngineer', 'chiefMechanic', 'pitCrewChief', 'technicalDirector', 'scout'];
 
 /** Shared context for generators: randomness plus a sequential id counter. */
 export interface GenCtx {
@@ -44,6 +46,8 @@ export interface DriverOpts {
   quality?: number;
   age?: number;
   teamId?: string | null;
+  /** Make this a pay driver who brings sponsor money. */
+  payDriver?: boolean;
 }
 
 export function generateDriver(ctx: GenCtx, tier: TierId, opts: DriverOpts = {}): Driver {
@@ -79,10 +83,17 @@ export function generateDriver(ctx: GenCtx, tier: TierId, opts: DriverOpts = {})
   // Young drivers have headroom; veterans are near their peak.
   const headroom = age < 22 ? rng.int(8, 25) : age < 26 ? rng.int(3, 12) : rng.int(0, 3);
   d.potential = r1(Math.max(d.pace, driverOverall(d)) + headroom);
+  if (opts.payDriver) d.payBudget = Math.round((L.driverSalary[1] * rng.float(0.35, 0.9)) / 1000) * 1000;
   if (d.teamId) {
     d.contract = { salary: salaryFor(driverOverall(d), L.driverRange, L.driverSalary), yearsLeft: rng.int(1, 3) };
   }
   return d;
+}
+
+/** A market driver: in the lower two leagues, about 1 in 4 is a weaker pay driver. */
+export function generateMarketDriver(ctx: GenCtx, tier: TierId, opts: DriverOpts = {}): Driver {
+  if (tier > 1 && ctx.rng.chance(0.25)) return generateDriver(ctx, tier, { ...opts, quality: ctx.rng.float(0, 0.35), payDriver: true });
+  return generateDriver(ctx, tier, opts);
 }
 
 export function generateStaff(ctx: GenCtx, tier: TierId, role: StaffRole, quality?: number, teamId: string | null = null): Staff {
@@ -156,6 +167,9 @@ function buildTeam(
     car: generateCar(rng, tier, quality),
     upgrades: { engine: 0, aero: 0, chassis: 0, reliability: 0 },
     budget: Math.round(LEAGUES[tier].startBudget * (0.8 + quality * 0.5)),
+    morale: 70,
+    spend: 0,
+    ...defaultCarFields(isPlayer ? undefined : rng),
   };
   return { team, drivers, staff };
 }
@@ -196,7 +210,7 @@ export function generateWorld(seed: number, player: PlayerSetup): GameState {
   const driverMarket: string[] = [];
   for (const tier of TIERS) {
     for (let i = 0; i < 5; i++) {
-      const d = generateDriver(ctx, tier, { quality: rng.float(0.1, 0.8) });
+      const d = generateMarketDriver(ctx, tier, { quality: rng.float(0.1, 0.8) });
       drivers[d.id] = d;
       driverMarket.push(d.id);
     }
@@ -210,7 +224,7 @@ export function generateWorld(seed: number, player: PlayerSetup): GameState {
     }
   }
 
-  return {
+  const world: GameState = {
     seed,
     season: 1,
     year: 2027,
@@ -224,5 +238,9 @@ export function generateWorld(seed: number, player: PlayerSetup): GameState {
     staffMarket,
     finance: { negativeStreak: 0, bankrupt: false, ledger: [] },
     history: [],
+    sponsors: { active: [], offers: [] },
+    settings: { budgetCap: false },
+    setup: { wing: 'medium', suspension: 'medium' },
   };
+  return initialSponsors(world);
 }

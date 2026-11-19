@@ -1,9 +1,13 @@
 // Upgrades old saves to the current shape, one version at a time, instead of wiping them.
 import { LEAGUES, TIERS } from '../data/leagues';
-import { calendarWeeks } from '../engine/generate';
+import { calendarWeeks, createGenCtx, generateStaff } from '../engine/generate';
+import { createRng, hashSeed } from '../engine/rng';
+import { initialSponsors } from '../engine/sponsors';
+import { defaultCarFields } from '../engine/car';
+import type { GameState, TierId } from '../engine/types';
 
 /** Bump when the saved shape changes, and add a step to MIGRATIONS below. */
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 4;
 
 type Save = Record<string, any>;
 
@@ -19,6 +23,30 @@ const MIGRATIONS: Record<number, (s: Save) => Save> = {
       if (L && !Array.isArray(L.weeks)) leagues[t] = { ...L, weeks: calendarWeeks(L.calendar?.length ?? LEAGUES[t].races) };
     }
     return { ...s, game: { ...g, leagues, history: Array.isArray(g.history) ? g.history : [] } };
+  },
+  // v2 -> v3: sponsors, team morale and spend, budget-cap setting, scouts on the staff market.
+  2: (s) => {
+    const g = s.game as GameState | null;
+    if (!g) return s;
+    const teams = Object.fromEntries(Object.entries(g.teams).map(([id, t]) => [id, { ...t, morale: t.morale ?? 70, spend: t.spend ?? 0 }]));
+    const ctx = createGenCtx(createRng(hashSeed(g.seed, 'migrate', 3)), g.nextId);
+    const staff = { ...g.staff };
+    const staffMarket = [...g.staffMarket];
+    for (const tier of TIERS as TierId[]) {
+      const p = generateStaff(ctx, tier, 'scout', 0.3 + 0.2 * (3 - tier));
+      staff[p.id] = p;
+      staffMarket.push(p.id);
+    }
+    let game: GameState = { ...g, teams, staff, staffMarket, nextId: ctx.counter(), settings: g.settings ?? { budgetCap: false }, sponsors: { active: [], offers: [] } };
+    game = initialSponsors(game);
+    return { ...s, game, lastReview: s.lastReview ? { ...s.lastReview, sponsors: s.lastReview.sponsors ?? [] } : s.lastReview };
+  },
+  // v3 -> v4: car concept, parts, R&D projects, engine/gearbox wear, setup. A weekend in progress is re-run.
+  3: (s) => {
+    const g = s.game as GameState | null;
+    if (!g) return s;
+    const teams = Object.fromEntries(Object.entries(g.teams).map(([id, t]) => [id, { ...defaultCarFields(), ...t }]));
+    return { ...s, weekend: null, race: null, game: { ...g, teams, setup: g.setup ?? { wing: 'medium', suspension: 'medium' } } };
   },
 };
 

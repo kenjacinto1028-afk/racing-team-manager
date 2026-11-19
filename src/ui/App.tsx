@@ -10,6 +10,7 @@ import { NavProvider, SCREENS, useNav, type ScreenId } from './nav';
 import { Car } from './screens/Car';
 import { Dashboard } from './screens/Dashboard';
 import { Drivers } from './screens/Drivers';
+import { Finance } from './screens/Finance';
 import { Glossary } from './screens/Glossary';
 import { NewGame } from './screens/NewGame';
 import { RaceWeekend } from './screens/RaceWeekend';
@@ -23,6 +24,7 @@ function screenFor(id: ScreenId): ReactNode {
     case 'drivers': return <Drivers />;
     case 'staff': return <Staff />;
     case 'car': return <Car />;
+    case 'finance': return <Finance />;
     case 'standings': return <Standings />;
     case 'race': return <RaceWeekend />;
     case 'review': return <SeasonReview />;
@@ -108,6 +110,7 @@ function Shell() {
           <button className="nav-btn" onClick={forward} disabled={!canForward} aria-label="Forward" title="Forward (Alt+→)">›</button>
           <span className="crumb">{screen.label}</span>
           <span className="topbar-spacer" />
+          <span className="pill"><Tip k="morale" plain>Morale</Tip> <b className={team.morale < 50 ? 'bad' : team.morale >= 80 ? 'good' : ''}>{team.morale}</b></span>
           <span className="pill"><Tip k="budget" plain>Budget</Tip> <b className={team.budget < 0 ? 'bad' : ''}>{money(team.budget)}</b></span>
         </header>
         <main className="content">{screenFor(current)}</main>

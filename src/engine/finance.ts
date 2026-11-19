@@ -1,6 +1,7 @@
 import { LEAGUES, TIERS } from '../data/leagues';
 import { clamp } from './rng';
 import { teamStandings } from './season';
+import { sponsorPerRace } from './sponsors';
 import type { CarStat, Driver, GameState, LedgerEntry, Team, TierId } from './types';
 
 /** Races in a row with a negative balance before the game ends. */
@@ -13,13 +14,33 @@ export function sponsorIncome(tier: TierId, position: number, teamsInTier = 10):
   return Math.round(LEAGUES[tier].sponsorPerRace * (1.4 - 0.7 * t));
 }
 
-/** Driver plus staff salaries paid each race. */
+/** Driver plus staff salaries paid each race (pay drivers excluded: see payDriverIncome). */
 export function raceSalaries(state: GameState, teamId: string): number {
   const team = state.teams[teamId];
   let sum = 0;
-  for (const id of team.driverIds) sum += state.drivers[id]?.contract?.salary ?? 0;
+  for (const id of team.driverIds) sum += Math.max(0, state.drivers[id]?.contract?.salary ?? 0);
   for (const id of Object.values(team.staffIds)) if (id) sum += state.staff[id]?.contract?.salary ?? 0;
   return sum;
+}
+
+/** Money pay drivers bring each race (their contract salary is negative). */
+export function payDriverIncome(state: GameState, teamId: string): number {
+  return state.teams[teamId].driverIds.reduce((s, id) => s + Math.max(0, -(state.drivers[id]?.contract?.salary ?? 0)), 0);
+}
+
+/** Formula Prime spending limit per season (R&D and signing fees), when the option is on. */
+export const BUDGET_CAP = 15_000_000;
+
+/** Null if the spend is allowed, otherwise the reason it isn't. */
+export function capBlocks(state: GameState, team: Team, cost: number): string | null {
+  if (!state.settings?.budgetCap || team.tier !== 1) return null;
+  return team.spend + cost > BUDGET_CAP ? 'That would break the budget cap' : null;
+}
+
+/** Team morale after a race: drifts back toward 70, up for points, down for a pointless day. */
+export function moraleAfterRace(morale: number, points: number): number {
+  const m = morale + (70 - morale) * 0.1 + (points > 0 ? Math.min(6, 1 + points / 8) : -1);
+  return Math.round(clamp(m, 20, 95));
 }
 
 function pushLedger(ledger: LedgerEntry[], entries: LedgerEntry[]): LedgerEntry[] {
@@ -41,19 +62,31 @@ export function applyRaceFinances(state: GameState, tier: TierId): GameState {
 
   for (const teamId of league.teamIds) {
     const pos = table.findIndex((r) => r.id === teamId) + 1;
-    const sponsor = sponsorIncome(tier, pos, league.teamIds.length);
-    const pts = last.entries.filter((e) => e.teamId === teamId).reduce((s, e) => s + e.points, 0);
+    const isPlayer = teamId === state.playerTeamId;
+    const sponsor = isPlayer && state.sponsors ? sponsorPerRace(state) : sponsorIncome(tier, pos, league.teamIds.length);
+    const mine = last.entries.filter((e) => e.teamId === teamId);
+    const pts = mine.reduce((s, e) => s + e.points, 0);
     const bonus = pts * LEAGUES[tier].pointBonus;
     const salaries = raceSalaries(state, teamId);
-    const budget = teams[teamId].budget + sponsor + bonus - salaries;
-    teams[teamId] = { ...teams[teamId], budget };
+    const payIn = payDriverIncome(state, teamId);
+    let resultBonuses = 0;
+    for (const e of mine) {
+      const c = state.drivers[e.driverId]?.contract;
+      if (!c || e.dnf) continue;
+      if (e.position === 1) resultBonuses += c.winBonus ?? 0;
+      if (e.position <= 3) resultBonuses += c.podiumBonus ?? 0;
+    }
+    const budget = teams[teamId].budget + sponsor + bonus + payIn - salaries - resultBonuses;
+    teams[teamId] = { ...teams[teamId], budget, morale: moraleAfterRace(teams[teamId].morale ?? 70, pts) };
 
-    if (teamId === state.playerTeamId) {
+    if (isPlayer) {
       const base = { season: state.season, round: last.round };
       const lines: LedgerEntry[] = [
         { ...base, label: 'Sponsor payment', amount: sponsor },
         ...(bonus ? [{ ...base, label: `Points bonus (${pts} pts)`, amount: bonus }] : []),
+        ...(payIn ? [{ ...base, label: 'Pay driver money', amount: payIn }] : []),
         { ...base, label: 'Salaries', amount: -salaries },
+        ...(resultBonuses ? [{ ...base, label: 'Driver win/podium bonuses', amount: -resultBonuses }] : []),
       ];
       ledger = pushLedger(ledger, lines);
       const negativeStreak = budget < 0 ? finance.negativeStreak + 1 : 0;
@@ -82,7 +115,7 @@ export function applyPrizeMoney(state: GameState): GameState {
 
 /** One-off fee to sign a driver: 3 races of salary. */
 export function signingFee(salary: number): number {
-  return salary * 3;
+  return Math.max(0, salary) * 3;
 }
 
 /** The highest tier a driver's level fits (1 = Formula Prime). */
@@ -95,6 +128,8 @@ export function driverLevelTier(overall: number): TierId {
  * Good drivers price themselves at their own level, so a Prime-level star costs Prime money even in Academy.
  */
 export function askingSalary(d: Driver, tier: TierId, overall: number): number {
+  // Pay drivers bring money instead: a negative salary.
+  if (d.payBudget) return -d.payBudget;
   const priceTier = Math.min(tier, driverLevelTier(overall)) as TierId;
   const L = LEAGUES[priceTier];
   const t = clamp((overall - L.driverRange[0]) / (L.driverRange[1] - L.driverRange[0]), 0, 1);
@@ -133,10 +168,13 @@ export function buyUpgrade(state: GameState, teamId: string, stat: CarStat): Upg
   const td = techDirectorRating(state, team);
   const cost = upgradeCost(team.tier, team.upgrades[stat], td);
   if (team.budget < cost) return { ok: false, reason: 'Not enough money' };
+  const capped = capBlocks(state, team, cost);
+  if (capped) return { ok: false, reason: capped };
   const gain = upgradeGain(team.car[stat], td);
   const next: Team = {
     ...team,
     budget: team.budget - cost,
+    spend: (team.spend ?? 0) + cost,
     car: { ...team.car, [stat]: Math.min(99, team.car[stat] + gain) },
     upgrades: { ...team.upgrades, [stat]: team.upgrades[stat] + 1 },
   };

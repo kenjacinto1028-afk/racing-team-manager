@@ -4,6 +4,16 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-19: Phase 11 Economy and finances
+- Sponsors: title sponsor + up to 3 partners, each pays per race and has a season goal (team position, points finishes, podiums, wins). Goal met = bonus; missed = 60% chance they leave. New offers each season, better with a better finish. New games start with a title + 2 partners.
+- Pay drivers (about 1 in 4 lower-league market drivers): bring money per race, no signing fee, fixed deals.
+- Contract talks (Drivers > Talk): salary, length, win/podium bonuses; accept / counter / refuse.
+- Firing drivers or staff pays a settlement and lowers team morale; morale (top bar) is worth up to ~0.1 s a lap.
+- Scout (5th staff role) narrows the potential range; 85+ shows it exactly.
+- Finance screen: KPIs, balance chart with season-end forecast, income/cost breakdown, sponsors tab, sortable ledger, optional Prime budget cap ($15M R&D + fees).
+- Save v3 (old saves get sponsors, morale and scouts). 79 tests pass; browser check with an old save, no console errors.
+- **Next:** Phase 12 Cars, parts and setup.
+
 ## 2026-11-19: Phase 10 Foundations
 - History archive: at each season end the game keeps final tables, champions, and a season line for every driver (team, league, races, wins, podiums, points, position) and staff member. About 10 KB per season. Helpers `driverCareer` / `staffCareer` ready for Phase 14.
 - Save upgrades: `store/migrations.ts` upgrades saves one version at a time (now v2). A v1 save loads with its career intact; only unknown versions reset.

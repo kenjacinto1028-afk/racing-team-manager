@@ -1,8 +1,10 @@
 // Everything that happens between seasons.
 import { LEAGUES, TIERS, DRIVERS_PER_TEAM } from '../data/leagues';
 import { createRng, hashSeed, type Rng } from './rng';
-import { applyPrizeMoney, askingSalary, upgradeCost, upgradeGain, techDirectorRating } from './finance';
-import { calendarWeeks, createGenCtx, driverOverall, generateDriver, generateStaff, makeCalendar, STAFF_ROLES } from './generate';
+import { applyPrizeMoney, askingSalary, capBlocks, upgradeCost, upgradeGain, techDirectorRating } from './finance';
+import { calendarWeeks, createGenCtx, driverOverall, generateDriver, generateMarketDriver, generateStaff, makeCalendar, STAFF_ROLES } from './generate';
+import { carNewSeason } from './car';
+import { refreshOffers, settleSponsors, type SponsorSeasonResult } from './sponsors';
 import { addToHistory } from './history';
 import { autoRaceNext } from './raceSetup';
 import {
@@ -24,6 +26,7 @@ export interface SeasonReview {
   playerPosition: number;
   playerPrize: number;
   retired: string[];
+  sponsors: SponsorSeasonResult[];
 }
 
 /** Race every tier to the end of its calendar (AI only). */
@@ -65,7 +68,7 @@ export function previewReview(state: GameState): SeasonReview {
   return {
     season: state.season, year: state.year, teamTables, driverTables, promoted, relegated,
     playerTierBefore: before, playerTierAfter: move ? move.to : before, playerPosition: pos,
-    playerPrize: LEAGUES[before].prizeMoney[pos - 1] ?? 0, retired: [],
+    playerPrize: LEAGUES[before].prizeMoney[pos - 1] ?? 0, retired: [], sponsors: [],
   };
 }
 
@@ -106,7 +109,7 @@ function carCarryOver(team: Team): Team {
   const mid = tierMid(team.tier);
   const car = { ...team.car };
   for (const k of STATS) car[k] = Math.round(car[k] - (car[k] - mid) * 0.2);
-  return { ...team, car, upgrades: { engine: 0, aero: 0, chassis: 0, reliability: 0 } };
+  return { ...team, car, upgrades: { engine: 0, aero: 0, chassis: 0, reliability: 0 }, spend: 0, morale: Math.round(((team.morale ?? 70) + 70) / 2) };
 }
 
 /** AI spends part of its budget on upgrades, keeping a reserve for salaries. */
@@ -116,9 +119,9 @@ function aiDevelop(state: GameState, team: Team, rng: Rng): Team {
   for (let i = 0; i < 8; i++) {
     const stat = rng.pick(STATS);
     const cost = upgradeCost(t.tier, t.upgrades[stat], techDirectorRating(state, t));
-    if (t.budget - cost < reserve) break;
+    if (t.budget - cost < reserve || capBlocks(state, t, cost)) break;
     t = {
-      ...t, budget: t.budget - cost,
+      ...t, budget: t.budget - cost, spend: (t.spend ?? 0) + cost,
       car: { ...t.car, [stat]: Math.min(99, t.car[stat] + upgradeGain(t.car[stat], techDirectorRating(state, t))) },
       upgrades: { ...t.upgrades, [stat]: t.upgrades[stat] + 1 },
     };
@@ -135,6 +138,9 @@ export function runOffseason(input: GameState): { state: GameState; review: Seas
   const rng = createRng(hashSeed(s.seed, 'offseason', s.season));
   const ctx = createGenCtx(rng, s.nextId, Object.values(s.drivers).filter((d) => !d.retired).map((d) => d.lastName));
 
+  const settled = settleSponsors(s, rng);
+  s = settled.state;
+  review.sponsors = settled.results;
   s = applyPrizeMoney(s);
   s = applyPromotionRelegation(s);
 
@@ -183,7 +189,7 @@ export function runOffseason(input: GameState): { state: GameState; review: Seas
   let market = s.driverMarket.filter((id) => newDrivers[id].age < 34);
   for (const tier of TIERS) {
     for (let i = 0; i < 4; i++) {
-      const d = generateDriver(ctx, tier, { quality: rng.float(0.1, 0.85), age: tier === 3 ? rng.int(16, 19) : undefined });
+      const d = generateMarketDriver(ctx, tier, { quality: rng.float(0.1, 0.85), age: tier === 3 ? rng.int(16, 19) : undefined });
       newDrivers[d.id] = d;
       market.push(d.id);
     }
@@ -205,7 +211,7 @@ export function runOffseason(input: GameState): { state: GameState; review: Seas
   const staff2 = { ...s.staff };
   for (const tier of TIERS) {
     for (const teamId of s.leagues[tier].teamIds) {
-      let team = carCarryOver(teams2[teamId]);
+      let team = carNewSeason(carCarryOver(teams2[teamId]), rng);
       if (!team.isPlayer) {
         while (team.driverIds.length < DRIVERS_PER_TEAM) {
           // Best affordable free agent; otherwise sign a rookie.
@@ -245,5 +251,6 @@ export function runOffseason(input: GameState): { state: GameState; review: Seas
     year: s.year + 1,
     nextId: ctx.counter(),
   };
+  s = refreshOffers(s, rng);
   return { state: s, review };
 }

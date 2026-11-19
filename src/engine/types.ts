@@ -5,7 +5,7 @@ export type TierId = 1 | 2 | 3;
 
 export type Compound = 'soft' | 'medium' | 'hard';
 export type DriverMode = 'push' | 'normal' | 'conserve';
-export type StaffRole = 'raceEngineer' | 'chiefMechanic' | 'pitCrewChief' | 'technicalDirector';
+export type StaffRole = 'raceEngineer' | 'chiefMechanic' | 'pitCrewChief' | 'technicalDirector' | 'scout';
 export type CarStat = 'engine' | 'aero' | 'chassis' | 'reliability';
 
 export interface Contract {
@@ -13,6 +13,9 @@ export interface Contract {
   salary: number;
   /** Seasons left, including the current one. 0 = expired. */
   yearsLeft: number;
+  /** Extra paid after each race win / podium (drivers only). */
+  winBonus?: number;
+  podiumBonus?: number;
 }
 
 export interface Driver {
@@ -31,6 +34,8 @@ export interface Driver {
   contract: Contract | null;
   teamId: string | null;
   retired?: boolean;
+  /** Pay driver: brings this much sponsor money per race instead of asking for a salary. */
+  payBudget?: number;
 }
 
 export interface Staff {
@@ -45,6 +50,18 @@ export interface Staff {
 
 export type CarStats = Record<CarStat, number>;
 
+/** Chassis design picked each season. */
+export type CarConcept = 'balanced' | 'lowDrag' | 'highDownforce' | 'tyreFriendly';
+export type WingLevel = 'low' | 'medium' | 'high';
+export type SuspensionSetting = 'soft' | 'medium' | 'stiff';
+export interface CarSetup { wing: WingLevel; suspension: SuspensionSetting }
+
+/** Power units and gearboxes wear out; using more than the allowance costs grid places. */
+export interface UnitUse { used: number; wear: number }
+export type UnitKind = 'engine' | 'gearbox';
+
+export interface RndProject { partId: string; racesLeft: number }
+
 export interface Team {
   id: string;
   name: string;
@@ -58,6 +75,19 @@ export interface Team {
   /** How many upgrades have been bought for each stat this season (drives cost). */
   upgrades: CarStats;
   budget: number;
+  /** Team spirit, 20-95 (70 = normal). Firing people lowers it; good results raise it. */
+  morale: number;
+  /** Money spent this season on R&D and signing fees (for the optional budget cap). */
+  spend: number;
+  concept: CarConcept;
+  /** Fitted part id per slot (see data/parts.ts). */
+  parts: Record<string, string>;
+  /** Designed parts the team can fit. */
+  ownedParts: string[];
+  projects: RndProject[];
+  units: Record<UnitKind, UnitUse>;
+  /** Grid places lost at the next race. */
+  gridPenalty: number;
 }
 
 export interface TrackProfile {
@@ -121,6 +151,37 @@ export interface LedgerEntry {
   label: string;
   /** Positive = income, negative = cost. */
   amount: number;
+}
+
+export type SponsorKind = 'title' | 'partner';
+
+export type SponsorGoal =
+  | { kind: 'teamPos'; target: number }
+  | { kind: 'pointsFinishes'; target: number }
+  | { kind: 'podiums'; target: number }
+  | { kind: 'wins'; target: number };
+
+export interface SponsorDeal {
+  id: string;
+  name: string;
+  kind: SponsorKind;
+  /** Paid after every race. */
+  perRace: number;
+  goal: SponsorGoal;
+  /** Paid at season end if the goal is met. */
+  bonus: number;
+  /** Seasons left, including the current one. */
+  seasons: number;
+}
+
+export interface SponsorState {
+  active: SponsorDeal[];
+  offers: SponsorDeal[];
+}
+
+export interface Settings {
+  /** Formula Prime spending limit on R&D and signing fees. */
+  budgetCap: boolean;
 }
 
 export interface FinanceState {
@@ -190,4 +251,9 @@ export interface GameState {
   finance: FinanceState;
   /** Past seasons, oldest first. */
   history: SeasonArchive[];
+  /** The player's sponsor deals and open offers. */
+  sponsors: SponsorState;
+  settings: Settings;
+  /** The player's car setup for the next race. */
+  setup: CarSetup;
 }

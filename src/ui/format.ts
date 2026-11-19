@@ -26,7 +26,7 @@ export function ordinal(n: number): string {
 }
 
 export const ROLE_LABEL: Record<string, string> = {
-  raceEngineer: 'Race Engineer', chiefMechanic: 'Chief Mechanic', pitCrewChief: 'Pit Crew Chief', technicalDirector: 'Technical Director',
+  raceEngineer: 'Race Engineer', chiefMechanic: 'Chief Mechanic', pitCrewChief: 'Pit Crew Chief', technicalDirector: 'Technical Director', scout: 'Scout',
 };
 
 export const FLAG: Record<string, string> = {

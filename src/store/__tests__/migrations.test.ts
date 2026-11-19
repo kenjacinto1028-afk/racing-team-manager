@@ -43,5 +43,13 @@ describe('save migration', () => {
     expect(g.history).toEqual([]);
     expect(g.leagues[1].weeks).toHaveLength(12);
     expect(store.getState().saveVersion).toBe(SAVE_VERSION);
+    // v3: sponsors, morale, scouts on the market.
+    expect(g.sponsors.active.length).toBe(3);
+    expect(g.teams[g.playerTeamId].morale).toBe(70);
+    expect(g.staffMarket.some((id) => g.staff[id].role === 'scout')).toBe(true);
+    // v4: car fields.
+    expect(g.teams[g.playerTeamId].parts.engine).toBe('engine-std');
+    expect(g.teams[g.playerTeamId].units.engine.used).toBe(1);
+    expect(g.setup.wing).toBe('medium');
   });
 });

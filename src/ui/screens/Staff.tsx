@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { STAFF_ROLES } from '../../engine/generate';
-import { staffOffer } from '../../engine/market';
+import { releaseCost, staffOffer } from '../../engine/market';
 import type { Staff as StaffT, StaffRole } from '../../engine/types';
 import { useGame } from '../../store/gameStore';
-import { Tabs, useFlash } from '../components/bits';
+import { ConfirmButton, Tabs, useFlash } from '../components/bits';
 import { DataTable, type Column } from '../components/DataTable';
 import { Rating, StatBar } from '../components/StatBar';
 import { Tip } from '../components/Tip';
@@ -15,11 +15,13 @@ const EFFECT: Record<StaffRole, string> = {
   chiefMechanic: 'Fewer mechanical failures (DNFs).',
   pitCrewChief: 'Quicker pit stops, fewer slow ones.',
   technicalDirector: 'Cheaper, bigger R&D upgrades.',
+  scout: "Sharper read on drivers' potential.",
 };
 
 export function Staff() {
   const { g, team } = usePlayer();
   const hire = useGame((s) => s.hireStaff);
+  const release = useGame((s) => s.releaseStaff);
   const racing = useGame((s) => !!s.race);
   const [role, setRole] = useState<StaffRole | 'all'>('all');
   const [flash, show] = useFlash();
@@ -54,10 +56,10 @@ export function Staff() {
     <div className="page">
       <div className="page-head">
         <h1>Staff</h1>
-        <p>One person per role. Hiring a replacement sends the current one to the market.</p>
+        <p>One person per role. Hiring a replacement sends the current one to the market. Releasing someone costs a <Tip k="settlement">settlement</Tip> and a little <Tip k="morale">morale</Tip>.</p>
       </div>
       {flash}
-      <div className="grid grid-4">
+      <div className="grid grid-5">
         {STAFF_ROLES.map((r) => {
           const s = team.staffIds[r] ? g.staff[team.staffIds[r]!] : null;
           return (
@@ -72,6 +74,15 @@ export function Staff() {
                     <span>{money(s.contract?.salary ?? 0)}/race</span>
                     <span>{s.contract?.yearsLeft ?? 0} season(s)</span>
                   </div>
+                  {(() => {
+                    const cost = s.contract ? releaseCost(s.contract.salary, s.contract.yearsLeft) : 0;
+                    return (
+                      <ConfirmButton className="btn btn-sm btn-ghost" disabled={racing || cost > team.budget} confirmText={`Settle ${money(cost)}? Morale -4`}
+                        onConfirm={() => { const res = release(s.id); show(res.ok ? `${s.name} released.` : res.reason, res.ok ? 'good' : 'bad'); }}>
+                        Release
+                      </ConfirmButton>
+                    );
+                  })()}
                 </>
               ) : (
                 <div className="bad">Vacant. Hire someone below.</div>

@@ -33,6 +33,8 @@ export function Dashboard() {
   else if (team.budget < salaries * 3) alerts.push({ kind: 'warn', text: 'Budget is low: less than 3 races of salaries left.' });
   const expiring = [...team.driverIds.map((id) => g.drivers[id]), ...Object.values(team.staffIds).map((id) => g.staff[id!])]
     .filter((p) => p?.contract?.yearsLeft === 1);
+  const openSlots = (g.sponsors.active.some((d) => d.kind === 'title') ? 0 : 1) + Math.max(0, 3 - g.sponsors.active.filter((d) => d.kind === 'partner').length);
+  if (openSlots && g.sponsors.offers.length) alerts.push({ kind: 'info', text: `${openSlots} sponsor slot(s) open and ${g.sponsors.offers.length} offer(s) waiting.`, to: 'finance' });
   if (expiring.length) alerts.push({ kind: 'info', text: `${expiring.length} contract(s) end this season. Renew them in the Season Review.` });
 
   const zone = (i: number) => (tier > 1 && i < MOVE_SPOTS ? 'zone-up' : tier < 3 && i >= table.length - MOVE_SPOTS ? 'zone-down' : '');
@@ -63,6 +65,8 @@ export function Dashboard() {
               : lastReview.playerTierAfter > lastReview.playerTierBefore ? `Relegated to ${league.name}. Time to rebuild and bounce back.`
               : `New season in ${league.name}. Last year you finished ${ordinal(lastReview.playerPosition)}.`}
             {lastReview.retired.length > 0 && ` ${lastReview.retired.length} driver(s) retired over the break.`}
+            {(lastReview.sponsors ?? []).some((x) => x.met) && ` Sponsor bonuses: ${money(lastReview.sponsors.reduce((a, x) => a + x.bonus, 0))}.`}
+            {(lastReview.sponsors ?? []).some((x) => !x.staying) && ` Leaving: ${lastReview.sponsors.filter((x) => !x.staying).map((x) => x.name).join(', ')}.`}
           </span>
         </div>
       )}

@@ -12,7 +12,7 @@ describe('generateWorld', () => {
     expect(world(7)).not.toEqual(world(8));
   });
 
-  it('builds 3 tiers of 10 teams with 2 drivers and 4 staff each', () => {
+  it('builds 3 tiers of 10 teams with 2 drivers and 5 staff each', () => {
     const s = world();
     for (const tier of TIERS) {
       const L = s.leagues[tier];
@@ -23,7 +23,7 @@ describe('generateWorld', () => {
         const t = s.teams[id];
         expect(t.tier).toBe(tier);
         expect(t.driverIds).toHaveLength(2);
-        expect(Object.keys(t.staffIds)).toHaveLength(4);
+        expect(Object.keys(t.staffIds)).toHaveLength(5);
         t.driverIds.forEach((d) => expect(s.drivers[d].teamId).toBe(id));
       }
     }

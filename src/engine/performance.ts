@@ -17,6 +17,14 @@ export interface Competitor {
   engineer: number;
   mechanic: number;
   pitCrew: number;
+  /** Team morale (70 = normal). Optional; missing counts as 70. */
+  morale?: number;
+  /** Seconds per lap from setup and car concept on this track (negative = faster). */
+  lapDelta?: number;
+  /** Tyre wear multiplier from the car concept (1 = normal). */
+  tyreWearMult?: number;
+  /** Mechanical failure multiplier from worn engine/gearbox (1 = fresh). */
+  mechRisk?: number;
 }
 
 export const COMPOUNDS: Compound[] = ['soft', 'medium', 'hard'];
@@ -43,7 +51,9 @@ export function baseLap(c: Competitor, track: Track): number {
     track.baseLapTime -
     (carScore(c.car, track) - 50) * 0.035 -
     (c.pace - 50) * 0.028 -
-    (c.engineer - 50) * 0.01
+    (c.engineer - 50) * 0.01 -
+    ((c.morale ?? 70) - 70) * 0.004 +
+    (c.lapDelta ?? 0)
   );
 }
 
@@ -53,7 +63,7 @@ export function tyrePenalty(wear: number): number {
 }
 
 export function wearPerLap(c: Competitor, compound: Compound, mode: DriverMode, track: Track): number {
-  return COMPOUND_WEAR[compound] * (0.6 + 0.8 * track.profile.tyreWear) * (1.2 - c.tyreManagement / 250) * MODE_WEAR[mode];
+  return COMPOUND_WEAR[compound] * (0.6 + 0.8 * track.profile.tyreWear) * (1.2 - c.tyreManagement / 250) * MODE_WEAR[mode] * (c.tyreWearMult ?? 1);
 }
 
 /** Standard deviation of random lap-time spread: smaller for consistent drivers. */
@@ -63,7 +73,7 @@ export function lapSpread(c: Competitor): number {
 
 /** Chance per lap that a car retires (mechanical failure or crash). */
 export function dnfChance(c: Competitor): { mechanical: number; crash: number } {
-  const mechanical = 0.0022 * (1.7 - c.car.reliability / 100) * (1.3 - c.mechanic / 200);
+  const mechanical = 0.0022 * (1.7 - c.car.reliability / 100) * (1.3 - c.mechanic / 200) * (c.mechRisk ?? 1);
   const crash = 0.0007 * (1.6 - c.consistency / 100) * (1.3 - c.experience / 250);
   return { mechanical, crash };
 }

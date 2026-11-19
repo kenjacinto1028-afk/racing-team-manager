@@ -29,7 +29,7 @@ describe('offseason', () => {
         expect(team.tier).toBe(t);
         if (!team.isPlayer) {
           expect(team.driverIds).toHaveLength(2);
-          expect(Object.keys(team.staffIds)).toHaveLength(4);
+          expect(Object.keys(team.staffIds)).toHaveLength(5);
         }
         team.driverIds.forEach((d) => {
           expect(s1.drivers[d].teamId).toBe(id);

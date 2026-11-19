@@ -1,6 +1,6 @@
 # Progress
 
-**Current phase:** Phase 10 Foundations done. Next: Phase 11 Economy and finances
+**Current phase:** Phase 11 Economy and finances done. Next: Phase 12 Cars, parts and setup
 **Last updated:** 2026-11-19
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
@@ -80,14 +80,14 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 - [x] Migrate old saves instead of resetting them (`store/migrations.ts`, save v2)
 - [x] Week numbers on the calendar
 
-## Phase 11: Economy and finances (Opus engine, Sonnet screens, Haiku data)
-- [ ] Sponsor deals with goals (title sponsor + 2-3 smaller)
-- [ ] Pay drivers (bring their own money)
-- [ ] Contract talks: salary, length, win/podium bonuses, counter-offers
-- [ ] Firing with settlement and morale hit
-- [ ] Scout staff role (reveals true potential)
-- [ ] Finance screen: breakdown, forecast, balance chart
-- [ ] Optional budget cap in Prime
+## Phase 11: Economy and finances ✅
+- [x] Sponsor deals with goals (title sponsor + up to 3 partners) (`engine/sponsors.ts`, `data/sponsors.ts`)
+- [x] Pay drivers (bring their own money)
+- [x] Contract talks: salary, length, win/podium bonuses, counter-offers
+- [x] Firing with settlement and morale hit (drivers and staff); team morale
+- [x] Scout staff role (narrows the potential estimate) (`engine/scouting.ts`)
+- [x] Finance screen: overview, balance chart with forecast, sponsors, ledger
+- [x] Optional budget cap in Prime (Finance > Overview)
 
 ## Phase 12: Cars, parts and setup (Opus engine, Sonnet screens, Haiku data)
 - [ ] Car concepts with pros and cons (low-drag, high-downforce, balanced, tyre-friendly)

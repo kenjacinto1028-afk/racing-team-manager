@@ -8,6 +8,8 @@ import { ConfirmButton, Empty, Tabs, useFlash } from '../components/bits';
 import { DataTable, type Column } from '../components/DataTable';
 import { Rating, StatBar } from '../components/StatBar';
 import { Tip } from '../components/Tip';
+import { ContractTalks } from '../components/ContractTalks';
+import { potentialRange } from '../../engine/scouting';
 import { FLAG, money } from '../format';
 import { usePlayer } from '../hooks';
 
@@ -32,6 +34,8 @@ export function Drivers() {
   const [age, setAge] = useState<AgeFilter>('all');
   const [afford, setAfford] = useState(false);
   const [flash, show] = useFlash();
+  const [talks, setTalks] = useState<Driver | null>(null);
+  const potStr = (d: Driver) => { const p = potentialRange(g, d); return p.exact ? String(p.lo) : `${p.lo}-${p.hi}`; };
 
   const mine = team.driverIds.map((id) => g.drivers[id]);
   const seatsFree = 2 - mine.length;
@@ -53,6 +57,7 @@ export function Drivers() {
   });
 
   const doHire = (d: Driver) => {
+    if (!d.payBudget) { setTalks(d); return; }
     const r = hire(d.id, 2);
     show(r.ok ? `Signed ${d.firstName} ${d.lastName} on a 2-year deal.` : r.reason, r.ok ? 'good' : 'bad');
     if (r.ok) setTab('team');
@@ -60,7 +65,7 @@ export function Drivers() {
 
   type Row = (typeof market)[number];
   const cols: Column<Row>[] = [
-    { key: 'name', label: 'Driver', sort: (r) => r.d.lastName, render: (r) => <span>{FLAG[r.d.nationality]} <b>{r.d.firstName} {r.d.lastName}</b></span> },
+    { key: 'name', label: 'Driver', sort: (r) => r.d.lastName, render: (r) => <span>{FLAG[r.d.nationality]} <b>{r.d.firstName} {r.d.lastName}</b>{r.d.payBudget ? <Tip k="payDriver" plain><span className="badge badge-pay">Pay</span></Tip> : null}</span> },
     { key: 'age', label: 'Age', tip: 'age', align: 'center', sort: (r) => r.d.age, render: (r) => r.d.age },
     { key: 'ovr', label: 'OVR', tip: 'overall', align: 'center', sort: (r) => r.ovr, render: (r) => <Rating v={r.ovr} k="overall" /> },
     { key: 'pace', label: 'PAC', tip: 'pace', align: 'center', sort: (r) => r.d.pace, render: (r) => r.d.pace },
@@ -68,14 +73,14 @@ export function Drivers() {
     { key: 'rc', label: 'RCR', tip: 'racecraft', align: 'center', sort: (r) => r.d.racecraft, render: (r) => r.d.racecraft },
     { key: 'tyr', label: 'TYR', tip: 'tyreManagement', align: 'center', sort: (r) => r.d.tyreManagement, render: (r) => r.d.tyreManagement },
     { key: 'exp', label: 'EXP', tip: 'experience', align: 'center', sort: (r) => r.d.experience, render: (r) => r.d.experience },
-    { key: 'pot', label: 'POT', tip: 'potential', align: 'center', sort: (r) => r.d.potential, render: (r) => <span className="muted">{r.d.potential}</span> },
-    { key: 'sal', label: 'Salary', tip: 'salary', align: 'right', sort: (r) => r.salary, render: (r) => money(r.salary) },
+    { key: 'pot', label: 'POT', tip: 'potential', align: 'center', sort: (r) => potentialRange(g, r.d).hi, render: (r) => <span className="muted">{potStr(r.d)}</span> },
+    { key: 'sal', label: 'Salary', tip: 'salary', align: 'right', sort: (r) => r.salary, render: (r) => r.salary < 0 ? <span className="good" title="A pay driver brings this much per race">+{money(-r.salary)}</span> : money(r.salary) },
     { key: 'fee', label: 'Fee', tip: 'signingFee', align: 'right', sort: (r) => r.fee, render: (r) => <span className={r.fee > team.budget ? 'bad' : ''}>{money(r.fee)}</span> },
     {
       key: 'act', label: '', align: 'right', render: (r) => !r.willing ? <span className="muted small" title="Stars won't race more than one league below their level.">Too good</span> : (
         <button className="btn btn-sm btn-primary" disabled={seatsFree === 0 || r.fee > team.budget || racing} onClick={() => doHire(r.d)}
-          title={seatsFree === 0 ? 'Both seats are full. Release a driver first.' : r.fee > team.budget ? 'Not enough money' : 'Sign for 2 seasons'}>
-          Sign
+          title={seatsFree === 0 ? 'Both seats are full. Release a driver first.' : r.fee > team.budget ? 'Not enough money' : r.d.payBudget ? 'Pay driver: fixed 2-season deal' : 'Open contract talks'}>
+          {r.d.payBudget ? 'Sign' : 'Talk'}
         </button>
       ),
     },
@@ -93,6 +98,8 @@ export function Drivers() {
         { id: 'market', label: 'Transfer market', count: market.length },
       ]} />
 
+      {talks && <ContractTalks d={talks} onClose={() => setTalks(null)} onSigned={(m) => { show(m); setTab('team'); }} />}
+
       {tab === 'team' && (
         <div className="grid grid-2">
           {mine.map((d) => {
@@ -102,15 +109,17 @@ export function Drivers() {
                 <div className="driver-head">
                   <div>
                     <div className="driver-name">{d.firstName} <b>{d.lastName}</b></div>
-                    <div className="muted small">{FLAG[d.nationality]} · Age {d.age} · <Tip k="potential">Potential</Tip> {d.potential}</div>
+                    <div className="muted small">{FLAG[d.nationality]} · Age {d.age} · <Tip k="potential">Potential</Tip> {potStr(d)}{d.payBudget ? <Tip k="payDriver" plain><span className="badge badge-pay">Pay driver</span></Tip> : null}</div>
                   </div>
                   <div className="ovr-badge"><Tip k="overall" plain>{driverOverall(d)}</Tip><span>OVR</span></div>
                 </div>
-                {STATS.map((s) => <StatBar key={s.k} k={s.k} label={s.label} value={d[s.k] as number} compare={d.potential} compareLabel={`Potential ${d.potential}`} />)}
+                {STATS.map((s) => <StatBar key={s.k} k={s.k} label={s.label} value={d[s.k] as number} compare={potentialRange(g, d).hi} compareLabel={`Potential ${potStr(d)}`} />)}
                 <div className="contract-row">
-                  <span><Tip k="salary">Salary</Tip> <b>{money(d.contract?.salary ?? 0)}</b>/race</span>
+                  {(d.contract?.salary ?? 0) < 0
+                    ? <span><Tip k="payDriver">Brings</Tip> <b className="good">{money(-(d.contract?.salary ?? 0))}</b>/race</span>
+                    : <span><Tip k="salary">Salary</Tip> <b>{money(d.contract?.salary ?? 0)}</b>/race{d.contract?.winBonus ? <span className="muted"> · win +{money(d.contract.winBonus)}</span> : null}{d.contract?.podiumBonus ? <span className="muted"> · podium +{money(d.contract.podiumBonus)}</span> : null}</span>}
                   <span><Tip k="contract">Contract</Tip> <b>{d.contract?.yearsLeft ?? 0}</b> season(s)</span>
-                  <ConfirmButton className="btn btn-sm" disabled={racing || cost > team.budget} confirmText={`Pay ${money(cost)}?`}
+                  <ConfirmButton className="btn btn-sm" disabled={racing || cost > team.budget} confirmText={`Settle ${money(cost)}? Morale -8`}
                     onConfirm={() => { const r = release(d.id); show(r.ok ? `${d.lastName} released.` : r.reason, r.ok ? 'good' : 'bad'); }}>
                     Release
                   </ConfirmButton>

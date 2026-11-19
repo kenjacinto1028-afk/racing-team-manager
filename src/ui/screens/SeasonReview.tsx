@@ -9,6 +9,7 @@ import { Rating } from '../components/StatBar';
 import { Tip } from '../components/Tip';
 import { money, ordinal, ROLE_LABEL } from '../format';
 import { usePlayer } from '../hooks';
+import { goalProgress } from '../../engine/sponsors';
 import { useNav } from '../nav';
 
 export function SeasonReview() {
@@ -127,6 +128,19 @@ export function SeasonReview() {
                 Staying: {people.filter((p) => (p.contract?.yearsLeft ?? 0) > 1).map((p) => p.name).join(', ')}.
               </div>
             )}
+          </section>
+          <section className="card">
+            <h3>Sponsor goals</h3>
+            {g.sponsors.active.length === 0 ? <p className="muted small">No sponsors this season.</p> : g.sponsors.active.map((d) => {
+              const p = goalProgress(g, d.goal);
+              return (
+                <div key={d.id} className="list-row">
+                  <span><b>{d.name}</b><div className="muted small">{p.text}</div></span>
+                  <span className={p.met ? 'good' : 'bad'}>{p.met ? `+${money(d.bonus)}` : 'Missed'}</span>
+                </div>
+              );
+            })}
+            <p className="muted small" style={{ marginTop: 8 }}>Sponsors who miss their <Tip k="sponsorGoal">goal</Tip> usually leave. New offers arrive for any empty slots.</p>
           </section>
           <section className="card">
             <h3>Over the break</h3>
