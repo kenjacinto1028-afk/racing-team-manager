@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { LEAGUES } from '../../data/leagues';
+import { LEAGUES, STARTING_TIER } from '../../data/leagues';
 import { driverOverall, generateWorld } from '../../engine/generate';
 import { useGame } from '../../store/gameStore';
 import { FLAG, money } from '../format';
@@ -26,7 +26,7 @@ export function NewGame() {
   const preview = useMemo(() => generateWorld(seed, { name: 'x', short: 'X', primary: '#000', secondary: '#fff' }), [seed]);
   const candidates = useMemo(
     () => preview.driverMarket.map((id) => preview.drivers[id])
-      .filter((d) => driverOverall(d) <= LEAGUES[3].driverRange[1])
+      .filter((d) => driverOverall(d) <= LEAGUES[STARTING_TIER].driverRange[1])
       .sort((a, b) => driverOverall(b) - driverOverall(a)).slice(0, 3),
     [preview],
   );
@@ -41,7 +41,7 @@ export function NewGame() {
         <div className="newgame-hero">
           <span className="tag">New career</span>
           <h1>Build your team</h1>
-          <p>You are the <Tip k="teamPrincipal">team principal</Tip>. Start in <Tip k="tiers">Formula Academy</Tip> with {money(LEAGUES[3].startBudget)}, finish in the top 2 to be <Tip k="promotion">promoted</Tip>, and climb to Formula Prime.</p>
+          <p>You are the <Tip k="teamPrincipal">team principal</Tip>. Start in <Tip k="tiers">{LEAGUES[STARTING_TIER].name}</Tip> with {money(LEAGUES[STARTING_TIER].startBudget)}, finish in the top 2 to be <Tip k="promotion">promoted</Tip>, and climb to Formula Prime.</p>
         </div>
 
         <div className="grid grid-2">

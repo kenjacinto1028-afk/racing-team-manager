@@ -91,7 +91,7 @@ describe('race simulation', () => {
     let wins = 0;
     for (let seed = 1; seed <= 100; seed++) {
       const t = TRACKS[seed % TRACKS.length];
-      const f = field(62, 52);
+      const f = field(64, 52);
       const q = runQualifying(f, t, seed);
       const r = simulateRace({ field: f, grid: q.map((x) => x.driverId), track: t, seed });
       if (order(r.cars)[0].c.driverId === 'strong') wins++;

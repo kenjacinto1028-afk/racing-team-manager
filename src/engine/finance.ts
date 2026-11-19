@@ -1,4 +1,4 @@
-import { LEAGUES, TIERS } from '../data/leagues';
+import { BOTTOM_TIER, LEAGUES, TIERS } from '../data/leagues';
 import { clamp } from './rng';
 import { teamStandings } from './season';
 import { sponsorPerRace } from './sponsors';
@@ -120,7 +120,7 @@ export function signingFee(salary: number): number {
 
 /** The highest tier a driver's level fits (1 = Formula Prime). */
 export function driverLevelTier(overall: number): TierId {
-  return TIERS.find((t) => overall >= LEAGUES[t].driverRange[0] + 4) ?? 3;
+  return TIERS.find((t) => overall >= LEAGUES[t].driverRange[0] + 4) ?? BOTTOM_TIER;
 }
 
 /**

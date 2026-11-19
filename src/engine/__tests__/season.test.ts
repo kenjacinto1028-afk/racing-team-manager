@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { POINTS } from '../../data/leagues';
+import { POINTS, TIERS } from '../../data/leagues';
 import { createRng } from '../rng';
 import {
   ageDriver, ageAllDrivers, applyPromotionRelegation, driverStandings, isLeagueComplete,
@@ -9,7 +9,7 @@ import type { Driver, GameState, TierId } from '../types';
 import { fakeResult, world } from './helpers';
 
 function playFullSeason(s: GameState, orders: Partial<Record<TierId, string[]>> = {}): GameState {
-  for (const tier of [1, 2, 3] as TierId[]) {
+  for (const tier of TIERS) {
     const order = orders[tier] ?? s.leagues[tier].teamIds;
     const races = s.leagues[tier].calendar.length;
     for (let r = 1; r <= races; r++) s = recordResult(s, tier, fakeResult(s, tier, order, r));
@@ -68,16 +68,16 @@ describe('points', () => {
 describe('promotion and relegation', () => {
   it('moves the top 2 up and the bottom 2 down', () => {
     let s = world();
-    const before = { 1: [...s.leagues[1].teamIds], 2: [...s.leagues[2].teamIds], 3: [...s.leagues[3].teamIds] };
+    const before = Object.fromEntries(TIERS.map((t) => [t, [...s.leagues[t].teamIds]])) as Record<TierId, string[]>;
     s = playFullSeason(s);
-    [1, 2, 3].forEach((t) => expect(isLeagueComplete(s.leagues[t as TierId])).toBe(true));
+    TIERS.forEach((t) => expect(isLeagueComplete(s.leagues[t])).toBe(true));
 
     const { promoted, relegated } = seasonMoves(s);
-    expect(promoted.map((m) => m.teamId).sort()).toEqual([...before[2].slice(0, 2), ...before[3].slice(0, 2)].sort());
-    expect(relegated.map((m) => m.teamId).sort()).toEqual([...before[1].slice(-2), ...before[2].slice(-2)].sort());
+    expect(promoted.map((m) => m.teamId).sort()).toEqual(TIERS.slice(1).flatMap((t) => before[t].slice(0, 2)).sort());
+    expect(relegated.map((m) => m.teamId).sort()).toEqual(TIERS.slice(0, -1).flatMap((t) => before[t].slice(-2)).sort());
 
     s = applyPromotionRelegation(s);
-    for (const tier of [1, 2, 3] as TierId[]) {
+    for (const tier of TIERS) {
       expect(s.leagues[tier].teamIds).toHaveLength(10);
       s.leagues[tier].teamIds.forEach((id) => expect(s.teams[id].tier).toBe(tier));
     }
@@ -86,7 +86,7 @@ describe('promotion and relegation', () => {
     expect(s.leagues[2].teamIds).toEqual(expect.arrayContaining([...before[3].slice(0, 2), ...before[1].slice(-2)]));
     // Champion of the top tier stays; last of the bottom tier stays.
     expect(s.teams[before[1][0]].tier).toBe(1);
-    expect(s.teams[before[3][9]].tier).toBe(3);
+    expect(s.teams[before[5][9]].tier).toBe(5);
   });
 
   it('promotes the player when they win Academy', () => {

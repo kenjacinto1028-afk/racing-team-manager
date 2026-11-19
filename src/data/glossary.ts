@@ -96,7 +96,11 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
   relegation: { term: 'Relegation', category: 'Season', short: 'The bottom 2 teams drop to the league below next season.' },
   podium: { term: 'Podium', category: 'Season', short: 'Finishing in the top 3.' },
   wins: { term: 'Wins', category: 'Season', short: 'Races finished in 1st place.' },
-  tiers: { term: 'Leagues', category: 'Season', short: 'Formula Academy (bottom, 8 races), Formula Challenger (middle, 10 races) and Formula Prime (top, 12 races).' },
+  tiers: { term: 'Leagues', category: 'Season', short: 'Five leagues, bottom to top: Formula Rookie (6 races), Formula Regional (7), Formula Academy (8), Formula Challenger (10) and Formula Prime (12). Top 2 go up, bottom 2 go down.' },
+  sideSeries: { term: 'Side series', category: 'Season', short: 'Extra championships for Academy, Regional and Rookie teams. They cost an entry fee and running costs, pay prize money, and give your drivers extra mileage. Closed once you reach Challenger.' },
+  endurance: { term: 'Endurance race', category: 'Racing', short: 'A long race where two drivers share one car, taking turns at the wheel. Their skills are averaged.' },
+  streetCircuit: { term: 'Street circuit', category: 'Racing', short: 'A track built on closed city roads. Walls are close, so mistakes end in crashes more often and overtaking is hard.' },
+  entryFee: { term: 'Entry fee', category: 'Money', short: 'Paid once to take part in a side series. You pay it even if you finish last.' },
   // Money
   budget: { term: 'Budget', category: 'Money', short: 'Money in the bank. If it stays below zero for 2 races in a row, the team goes bankrupt.' },
   salary: { term: 'Salary', category: 'Money', short: 'Paid every race to each driver and staff member.' },

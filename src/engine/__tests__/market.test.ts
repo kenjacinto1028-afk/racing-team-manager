@@ -21,7 +21,7 @@ describe('market', () => {
     expect(rel.state.driverMarket).toContain(out);
     expect(rel.state.teams[pid].budget).toBe(s0.teams[pid].budget - rel.cost);
 
-    const target = rel.state.driverMarket.find((id) => id !== out && willingToJoin(driverOverall(rel.state.drivers[id]), 3))!;
+    const target = rel.state.driverMarket.find((id) => id !== out && !rel.state.drivers[id].payBudget && willingToJoin(driverOverall(rel.state.drivers[id]), 3))!;
     const offer = driverOffer(rel.state, pid, target);
     const hire = hireDriver(rel.state, pid, target);
     if (!hire.ok) throw new Error(hire.reason);

@@ -9,6 +9,7 @@ import { previewReview, renewContract as engineRenew, runOffseason, syncOtherLea
 import { applyOrder, raceToResult, simulateToEnd, stepLap, type RaceState } from '../engine/raceSim';
 import { checkRaceFeats, checkSeasonFeats } from '../engine/feats';
 import type { RecordBreak } from '../engine/records';
+import { enterSide as engineEnterSide, runDueSideRaces, type SideId, type SideNews } from '../engine/sideSeries';
 import { completeRaceDetailed, prepareWeekend, startRace as engineStartRace, type Weekend } from '../engine/raceSetup';
 import { isLeagueComplete } from '../engine/season';
 import { buildFacility as engineBuild, promoteYouth as enginePromote, releaseYouth as engineReleaseYouth, sendOnCourse as engineCourse, setTraining as engineSetTraining, signYouth as engineSignYouth } from '../engine/development';
@@ -31,6 +32,8 @@ export interface LastRace {
   records?: RecordBreak[];
   /** Feats the player unlocked in this race. */
   feats?: string[];
+  /** Side-series races run straight after this round. */
+  side?: SideNews[];
 }
 
 export type ActionResult = { ok: true } | { ok: false; reason: string };
@@ -55,6 +58,8 @@ export interface GameStore extends Data {
   /** Make a contract offer. On 'accept' the driver is signed straight away. */
   offerContract: (driverId: string, offer: ContractOffer) => TalkReply | { kind: 'error'; note: string };
   signSponsor: (offerId: string) => ActionResult;
+  /** Enter a side championship (Endurance Cup, Street Invitational, Winter Series). */
+  enterSide: (id: SideId) => ActionResult;
   setBudgetCap: (on: boolean) => void;
   setConcept: (c: CarConcept) => ActionResult;
   startProject: (partId: string) => ActionResult;
@@ -145,6 +150,7 @@ export function createGameStore(storage?: StateStorage, name = 'rtm-save') {
             return reply;
           },
           signSponsor: (offerId) => withGame((g) => engineSignSponsor(g, offerId)),
+          enterSide: (id) => withGame((g) => engineEnterSide(g, id)),
           setConcept: (c) => withGame((g) => engineSetConcept(g, c)),
           startProject: (id) => withGame((g) => engineStartProject(g, g.playerTeamId, id)),
           fitPart: (id) => withGame((g) => engineFitPart(g, g.playerTeamId, id)),
@@ -215,12 +221,13 @@ export function createGameStore(storage?: StateStorage, name = 'rtm-save') {
             const done = completeRaceDetailed(g, w.tier, race, w.round);
             const result = raceToResult(race, w.round);
             const fe = checkRaceFeats(done.state, result, done.broken, before);
-            let next = fe.state;
+            const sideRun = runDueSideRaces(fe.state);
+            let next = sideRun.state;
             const after = next.teams[next.playerTeamId].budget;
             next = syncOtherLeagues(next);
             set({
               game: next, race: null, weekend: null,
-              lastRace: { season: g.season, tier: w.tier, round: w.round, result, budgetBefore: before, budgetAfter: after, records: done.broken, feats: fe.unlocked },
+              lastRace: { season: g.season, tier: w.tier, round: w.round, result, budgetBefore: before, budgetAfter: after, records: done.broken, feats: fe.unlocked, side: sideRun.news },
             });
             return { ok: true };
           },

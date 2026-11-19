@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
 
 export type ScreenId =
-  | 'hq' | 'drivers' | 'staff' | 'dev' | 'car' | 'finance' | 'standings' | 'race' | 'history' | 'records' | 'review' | 'glossary' | 'profile';
+  | 'hq' | 'drivers' | 'staff' | 'dev' | 'car' | 'finance' | 'standings' | 'race' | 'history' | 'records' | 'leagues' | 'review' | 'glossary' | 'profile';
 
 /** Which person or team a profile page shows. */
 export interface ProfileRef { kind: 'driver' | 'staff' | 'team'; id: string }
@@ -14,6 +14,7 @@ export const SCREENS: { id: ScreenId; label: string; icon: string; blurb: string
   { id: 'car', label: 'Car / R&D', icon: '⚙', blurb: 'Spend money on research to improve engine, aero, chassis and reliability.' },
   { id: 'finance', label: 'Finance', icon: '$', blurb: 'Money in and out, sponsor deals and their goals, and a season forecast.' },
   { id: 'standings', label: 'Standings', icon: '☰', blurb: 'The race calendar and the championship tables.' },
+  { id: 'leagues', label: 'Leagues', icon: '⇅', blurb: 'The five-league ladder and side series for the lower leagues.' },
   { id: 'race', label: 'Race Weekend', icon: '⚑', blurb: 'Qualifying, then the live race with timing tower and track map.' },
   { id: 'history', label: 'History', icon: '🏆', blurb: 'Your team through the years, the trophy cabinet and past champions.' },
   { id: 'records', label: 'Records', icon: '⏱', blurb: 'The all-time record book, track lap records and your badge wall of feats.' },

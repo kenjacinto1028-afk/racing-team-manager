@@ -1,6 +1,8 @@
 // Upgrades old saves to the current shape, one version at a time, instead of wiping them.
-import { LEAGUES, TIERS } from '../data/leagues';
-import { calendarWeeks, createGenCtx, generateStaff } from '../engine/generate';
+import { LEAGUES, TEAMS_PER_TIER, TIERS } from '../data/leagues';
+import { calendarWeeks, createGenCtx, generateMarketDriver, generateStaff, generateTier, makeCalendar, STAFF_ROLES } from '../engine/generate';
+import { TEAM_NAMES } from '../data/names';
+import { emptySide } from '../engine/sideSeries';
 import { createRng, hashSeed } from '../engine/rng';
 import { initialSponsors } from '../engine/sponsors';
 import { defaultCarFields } from '../engine/car';
@@ -9,7 +11,7 @@ import { emptyRecords, updateRecords } from '../engine/records';
 import type { GameState, TierId } from '../engine/types';
 
 /** Bump when the saved shape changes, and add a step to MIGRATIONS below. */
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 
 type Save = Record<string, any>;
 
@@ -35,7 +37,7 @@ const MIGRATIONS: Record<number, (s: Save) => Save> = {
     const staff = { ...g.staff };
     const staffMarket = [...g.staffMarket];
     for (const tier of TIERS as TierId[]) {
-      const p = generateStaff(ctx, tier, 'scout', 0.3 + 0.2 * (3 - tier));
+      const p = generateStaff(ctx, tier, 'scout', 0.3 + 0.2 * Math.max(0, 3 - tier));
       staff[p.id] = p;
       staffMarket.push(p.id);
     }
@@ -67,6 +69,33 @@ const MIGRATIONS: Record<number, (s: Save) => Save> = {
     // Seed the records from this season's races so far (older seasons kept no lap times).
     let game: GameState = { ...g, records: g.records ?? emptyRecords(), feats: g.feats ?? {} };
     for (const t of TIERS) for (const r of game.leagues[t]?.results ?? []) game = updateRecords(game, t, r).state;
+    return { ...s, game };
+  },
+  // v6 -> v7: two new leagues below Academy (Formula Regional, Formula Rookie) and side championships.
+  6: (s) => {
+    const g = s.game as GameState | null;
+    if (!g) return s;
+    const names = Object.values(g.drivers).map((d) => d.lastName);
+    const ctx = createGenCtx(createRng(hashSeed(g.seed, 'migrate', 7)), g.nextId, names);
+    const usedTeams = new Set(Object.values(g.teams).map((t) => t.name));
+    let free = TEAM_NAMES.filter((n) => !usedTeams.has(n.name));
+    const teams = { ...g.teams }; const drivers = { ...g.drivers }; const staff = { ...g.staff };
+    const leagues = { ...g.leagues };
+    const driverMarket = [...g.driverMarket]; const staffMarket = [...g.staffMarket];
+    for (const tier of [4, 5] as TierId[]) {
+      if (leagues[tier]) continue;
+      const bundles = generateTier(ctx, tier, free.slice(0, TEAMS_PER_TIER));
+      free = free.slice(TEAMS_PER_TIER);
+      for (const b of bundles) {
+        teams[b.team.id] = b.team;
+        b.drivers.forEach((d) => (drivers[d.id] = d));
+        b.staff.forEach((p) => (staff[p.id] = p));
+      }
+      leagues[tier] = { tier, teamIds: bundles.map((b) => b.team.id), calendar: makeCalendar(ctx.rng, tier), weeks: calendarWeeks(LEAGUES[tier].races), results: [] };
+      for (let i = 0; i < 5; i++) { const d = generateMarketDriver(ctx, tier, { quality: ctx.rng.float(0.1, 0.8) }); drivers[d.id] = d; driverMarket.push(d.id); }
+      for (const role of STAFF_ROLES) { const p = generateStaff(ctx, tier, role, ctx.rng.float(0.2, 0.9)); staff[p.id] = p; staffMarket.push(p.id); }
+    }
+    const game: GameState = { ...g, teams, drivers, staff, leagues, driverMarket, staffMarket, nextId: ctx.counter(), side: g.side ?? emptySide(g.season) };
     return { ...s, game };
   },
 };

@@ -59,14 +59,15 @@ describe('game store', () => {
     store.getState().newGame(SETUP, { seed: 3, pickDriverId: pick });
     const g = store.getState().game!;
     expect(g.teams[g.playerTeamId].driverIds).toContain(pick);
-    expect(g.teams[g.playerTeamId].budget).toBe(1_500_000);
+    expect(g.teams[g.playerTeamId].tier).toBe(5);
+    expect(g.teams[g.playerTeamId].budget).toBe(400_000);
   });
 
   it('plays a whole season and moves to the next', () => {
     const store = createGameStore(memoryStorage(), 't4');
     store.getState().newGame(SETUP, { seed: 4 });
     expect(store.getState().endSeason().ok).toBe(false);
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 6; i++) {
       expect(store.getState().prepareRace().ok).toBe(true);
       store.getState().startRace();
       store.getState().skipRace();

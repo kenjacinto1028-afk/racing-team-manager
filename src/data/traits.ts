@@ -20,4 +20,4 @@ export const TRAITS: Record<TraitId, TraitDef> = {
 export const TRAIT_IDS = Object.keys(TRAITS) as TraitId[];
 
 /** Track ids that count as street circuits. */
-export const STREET_TRACKS = ['monaco', 'lagoon'];
+export const STREET_TRACKS = ['monaco', 'lagoon', 'docklands'];

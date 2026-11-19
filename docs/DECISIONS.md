@@ -4,6 +4,10 @@ Record every design or technical decision here, newest first, so future sessions
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-11-19 | Side series money scales with your league's sponsor income; entry fee + running costs mean only a top-5 finish usually pays | A choice, not free money |
+| 2026-11-19 | Side races are simulated instantly after the matching league round (Winter Series at season end), not watched live | Keeps the season moving; results show as headlines |
+| 2026-11-19 | Endurance Cup: one car per team, the two drivers' skills averaged | Simple way to model drivers sharing a car |
+| 2026-11-19 | Old saves get the two new leagues added below; their team stays where it is | Matches the "existing saves keep their tier" decision |
 | 2026-11-19 | All-time race records (lap per track, youngest/oldest winner, biggest margin) are stored in the save; career records stay computed from the archive | Lap times aren't in the archive; the rest already is |
 | 2026-11-19 | The first race at a track sets its record quietly; only later beats are announced | Avoids a flood of "new record" alerts in season 1 |
 | 2026-11-19 | Records get their own sidebar screen; History stays for teams and champions | Easier to find, keeps History focused |

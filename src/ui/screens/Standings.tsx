@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LEAGUES, MOVE_SPOTS, TIERS } from '../../data/leagues';
+import { BOTTOM_TIER, LEAGUES, MOVE_SPOTS, TIERS } from '../../data/leagues';
 import { TRACK_BY_ID } from '../../data/tracks';
 import { driverStandings, teamStandings, type StandingRow } from '../../engine/season';
 import type { TierId } from '../../engine/types';
@@ -25,7 +25,7 @@ export function Standings() {
     if (!listed.has(id)) drivers.push({ id, teamId: tid, points: 0, wins: 0, podiums: 0, finishes: [], pos: drivers.length + 1 });
   }));
 
-  const zone = (pos: number) => (tier > 1 && pos <= MOVE_SPOTS ? 'zone-up' : tier < 3 && pos > teams.length - MOVE_SPOTS ? 'zone-down' : '');
+  const zone = (pos: number) => (tier > 1 && pos <= MOVE_SPOTS ? 'zone-up' : tier < BOTTOM_TIER && pos > teams.length - MOVE_SPOTS ? 'zone-down' : '');
 
   type TRow = StandingRow & { pos: number };
   const teamCols: Column<TRow>[] = [
@@ -67,7 +67,7 @@ export function Standings() {
           <DataTable rows={teams} columns={teamCols} rowKey={(r) => r.id} rowClass={(r) => (r.id === team.id ? 'me ' : '') + zone(r.pos)} />
           <div className="legend">
             {tier > 1 && <span><i className="legend-up" /> Promotion</span>}
-            {tier < 3 && <span><i className="legend-down" /> Relegation</span>}
+            {tier < BOTTOM_TIER && <span><i className="legend-down" /> Relegation</span>}
           </div>
         </section>
       )}

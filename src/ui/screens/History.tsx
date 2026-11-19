@@ -16,9 +16,18 @@ export function History() {
   const [tab, setTab] = useState<Tab>('team');
   const rows = [...g.history].reverse();
   type R = (typeof rows)[number];
+  // One column per league: drivers' champion on top, teams' champion below.
   const tierCols = (tier: TierId): Column<R>[] => [
-    { key: `d${tier}`, label: `${LEAGUES[tier].short} drivers`, render: (h) => (h.champions[tier] ? <DriverLink id={h.champions[tier]!} full /> : '-') },
-    { key: `t${tier}`, label: `${LEAGUES[tier].short} teams`, render: (h) => { const t = h.tables[tier]?.[0]; return t && g.teams[t.teamId] ? <TeamLink id={t.teamId}><TeamName team={g.teams[t.teamId]} short /></TeamLink> : '-'; } },
+    { key: `c${tier}`, label: LEAGUES[tier].name.replace('Formula ', ''), tip: 'tiers', render: (h) => {
+      const t = h.tables[tier]?.[0];
+      if (!h.champions[tier] && !t) return <span className="muted">-</span>;
+      return (
+        <div className="champ-cell">
+          <span>{h.champions[tier] ? <DriverLink id={h.champions[tier]!} /> : '-'}</span>
+          <span className="small">{t && g.teams[t.teamId] ? <TeamLink id={t.teamId}><TeamName team={g.teams[t.teamId]} short /></TeamLink> : '-'}</span>
+        </div>
+      );
+    } },
   ];
   const cols: Column<R>[] = [
     { key: 'season', label: 'Season', sort: (h) => h.season, render: (h) => <span>S{h.season} <span className="muted small">{h.year}</span></span> },
@@ -28,7 +37,7 @@ export function History() {
     <div className="page">
       <div className="page-head">
         <h1>History</h1>
-        <p>Every season your team has raced, your trophy cabinet, and the champions of every league. Click any name to open their career page.</p>
+        <p>Every season your team has raced, your trophy cabinet, and the champions of every league (driver on top, team below). Click any name to open their career page.</p>
       </div>
       <Tabs<Tab> value={tab} onChange={setTab} tabs={[{ id: 'team', label: team.name }, { id: 'champions', label: 'Champions', count: g.history.length }]} />
       {tab === 'team' && <TeamProfile id={team.id} embedded />}

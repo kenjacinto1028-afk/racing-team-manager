@@ -35,6 +35,23 @@ describe('save migration', () => {
     expect(m.game.feats).toEqual({});
   });
 
+  it('v6 -> v7 adds the two new leagues and keeps the player where they are', () => {
+    const g = generateWorld(13, SETUP, { startTier: 3 }) as unknown as Record<string, any>;
+    for (const t of [4, 5]) {
+      for (const id of g.leagues[t].teamIds) delete g.teams[id];
+      delete g.leagues[t];
+    }
+    delete g.side;
+    const m = migrateSave({ saveVersion: 6, game: g, weekend: null, race: null, raceSpeed: 4, lastRace: null, lastReview: null }, 6)!;
+    expect(m.game.teams[m.game.playerTeamId].tier).toBe(3);
+    for (const t of [4, 5]) {
+      expect(m.game.leagues[t].teamIds).toHaveLength(10);
+      for (const id of m.game.leagues[t].teamIds) expect(m.game.teams[id].tier).toBe(t);
+    }
+    expect(new Set(Object.values(m.game.teams).map((t: any) => t.name)).size).toBe(Object.keys(m.game.teams).length);
+    expect(m.game.side.entered).toEqual([]);
+  });
+
   it('refuses unknown or future versions', () => {
     expect(migrateSave(v1Save(), 0)).toBeNull();
     expect(migrateSave(v1Save(), SAVE_VERSION + 1)).toBeNull();

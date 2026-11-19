@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { LEAGUES, MOVE_SPOTS, TIERS } from '../../data/leagues';
+import { BOTTOM_TIER, LEAGUES, MOVE_SPOTS, TIERS } from '../../data/leagues';
 import { driverOverall } from '../../engine/generate';
 import { completeAllLeagues, previewReview, renewalSalary } from '../../engine/offseason';
 import type { TierId } from '../../engine/types';
@@ -76,7 +76,7 @@ export function SeasonReview() {
             <tbody>
               {table.map((r, i) => {
                 const movesUp = tier > 1 && i < MOVE_SPOTS;
-                const movesDown = tier < 3 && i >= table.length - MOVE_SPOTS;
+                const movesDown = tier < BOTTOM_TIER && i >= table.length - MOVE_SPOTS;
                 return (
                   <tr key={r.id} className={(r.id === team.id ? 'me ' : '') + (movesUp ? 'zone-up' : movesDown ? 'zone-down' : '')}>
                     <td style={{ width: 44 }}><Pos n={i + 1} /></td>

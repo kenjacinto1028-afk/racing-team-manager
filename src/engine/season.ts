@@ -1,4 +1,4 @@
-import { LEAGUES, MOVE_SPOTS, POINTS, TIERS } from '../data/leagues';
+import { BOTTOM_TIER, LEAGUES, MOVE_SPOTS, POINTS, TIERS } from '../data/leagues';
 import { clamp, type Rng } from './rng';
 import type { Driver, GameState, LeagueState, RaceResult, ResultEntry, TierId } from './types';
 
@@ -102,7 +102,7 @@ export function seasonMoves(state: GameState): { promoted: TeamMove[]; relegated
     if (tier > 1) {
       table.slice(0, MOVE_SPOTS).forEach((r) => promoted.push({ teamId: r.id, from: tier, to: (tier - 1) as TierId }));
     }
-    if (tier < 3) {
+    if (tier < BOTTOM_TIER) {
       table.slice(-MOVE_SPOTS).forEach((r) => relegated.push({ teamId: r.id, from: tier, to: (tier + 1) as TierId }));
     }
   }

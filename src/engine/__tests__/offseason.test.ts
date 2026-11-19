@@ -19,8 +19,8 @@ describe('offseason', () => {
     TIERS.forEach((t) => expect(isLeagueComplete(s0.leagues[t])).toBe(true));
     const { state: s1, review } = runOffseason(s0);
     expect(s1.season).toBe(2);
-    expect(review.promoted).toHaveLength(4);
-    expect(review.relegated).toHaveLength(4);
+    expect(review.promoted).toHaveLength(8);
+    expect(review.relegated).toHaveLength(8);
     for (const t of TIERS) {
       expect(s1.leagues[t].results).toHaveLength(0);
       expect(s1.leagues[t].teamIds).toHaveLength(10);

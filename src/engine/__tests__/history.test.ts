@@ -54,8 +54,8 @@ describe('season history', () => {
       expect(lines.length).toBeGreaterThanOrEqual(20);
       expect(lines.reduce((a, d) => a + d.wins, 0)).toBe(done.leagues[t].results.length);
     }
-    // 10 teams x 3 tiers x 5 roles.
-    expect(h.staff).toHaveLength(150);
+    // 10 teams x 5 tiers x 5 roles.
+    expect(h.staff).toHaveLength(250);
   });
 
   it('keeps growing across seasons and career helpers read it', () => {
@@ -66,8 +66,8 @@ describe('season history', () => {
     expect(driverCareer(s, champ)[0]).toMatchObject({ season: 1, pos: 1, tier: 1 });
     const someStaff = s.history[0].staff[0].staffId;
     expect(staffCareer(s, someStaff).length).toBeGreaterThanOrEqual(1);
-    // Compact: three seasons stay well under 100 KB.
-    expect(JSON.stringify(s.history).length).toBeLessThan(100_000);
+    // Compact: three seasons of five leagues stay well under 200 KB.
+    expect(JSON.stringify(s.history).length).toBeLessThan(200_000);
   });
 
   it('does not archive the same season twice', () => {

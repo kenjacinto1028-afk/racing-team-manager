@@ -3,8 +3,9 @@ import type { GameState, RaceResult, ResultEntry, TierId } from '../types';
 
 export const PLAYER = { name: 'Test Racing', short: 'TST', primary: '#ff0000', secondary: '#ffffff' };
 
-export function world(seed = 42): GameState {
-  return generateWorld(seed, PLAYER);
+/** Most tests use a career that starts in Formula Academy (tier 3), the old starting league. */
+export function world(seed = 42, startTier: TierId = 3): GameState {
+  return generateWorld(seed, PLAYER, { startTier });
 }
 
 /** A result where the given team order finishes 1st/2nd, 3rd/4th, ... (both cars together). */

@@ -1,6 +1,6 @@
 # Progress
 
-**Current phase:** Phase 15 World records and feats done. Next: Phase 16 More leagues
+**Current phase:** Phases 10-16 done (on the work branch). Next: push to the live game once approved
 **Last updated:** 2026-11-19
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
@@ -119,12 +119,13 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 - [x] Record-broken alerts: race results headlines, HQ alerts, live "lap record pace" banner
 - [x] Save v6 (old saves seed records from the current season)
 
-## Phase 16: More leagues (Opus engine, Sonnet screens, Haiku data)
+## Phase 16: More leagues ✅
 - [x] Decide: 5-tier ladder + side championships for tiers 3-5
 - [x] Decide: new games start in tier 5 (Formula Rookie)
-- [ ] Add Formula Regional (tier 4) and Formula Rookie (tier 5)
-- [ ] Side championships: Endurance Cup, Winter Series, Street Invitational
-- [ ] League screens, new tracks and teams
+- [x] Add Formula Regional (tier 4, 7 races) and Formula Rookie (tier 5, 6 races)
+- [x] Side championships: Endurance Cup, Winter Series, Street Invitational (`engine/sideSeries.ts`)
+- [x] Leagues screen (ladder + side series), 3 new tracks, 20 new teams
+- [x] Save v7: old saves keep their league and gain the two new ones
 
 ---
 

@@ -353,7 +353,7 @@ function Results() {
         <p>{g.drivers[winner.driverId].firstName} {g.drivers[winner.driverId].lastName} wins for {g.teams[winner.teamId].name}.</p>
       </div>
       {flash}
-      <NewsBanner records={lastRace.records} feats={lastRace.feats} title="Headlines" />
+      <NewsBanner records={lastRace.records} feats={lastRace.feats} side={lastRace.side} title="Headlines" />
       <div className="grid grid-2-1">
         <section className="card">
           <DataTable rows={res.entries} columns={cols} rowKey={(r) => r.driverId} rowClass={(r) => (r.teamId === team.id ? 'me' : undefined)} />

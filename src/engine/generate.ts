@@ -63,7 +63,7 @@ export function generateDriver(ctx: GenCtx, tier: TierId, opts: DriverOpts = {})
     lastName = rng.pick(nation.last);
   }
   ctx.usedNames.add(lastName);
-  const age = opts.age ?? (tier === 3 ? rng.int(17, 23) : tier === 2 ? rng.int(19, 28) : rng.int(21, 36));
+  const age = opts.age ?? (tier === 5 ? rng.int(15, 19) : tier === 4 ? rng.int(16, 21) : tier === 3 ? rng.int(17, 23) : tier === 2 ? rng.int(19, 28) : rng.int(21, 36));
   const q = opts.quality ?? rng.next();
   const base = L.driverRange[0] + (L.driverRange[1] - L.driverRange[0]) * q;
   const expBase = clamp((age - 16) * 5 + rng.int(-6, 6), 5, 95);
@@ -147,7 +147,7 @@ export interface PlayerSetup {
   secondary: string;
 }
 
-interface Bundle { team: Team; drivers: Driver[]; staff: Staff[] }
+export interface Bundle { team: Team; drivers: Driver[]; staff: Staff[] }
 
 function buildTeam(
   ctx: GenCtx, tier: TierId, quality: number,
@@ -178,8 +178,21 @@ function buildTeam(
   return { team, drivers, staff };
 }
 
-/** Build a brand-new world: 3 tiers of 10 teams, the player in Formula Academy, plus job markets. */
-export function generateWorld(seed: number, player: PlayerSetup): GameState {
+/** Build the 10 AI teams for one tier (fewer when the player joins it). Earlier names are stronger teams. */
+export function generateTier(
+  ctx: GenCtx, tier: TierId, names: { name: string; short: string; primary: string; secondary: string }[], count = TEAMS_PER_TIER,
+): Bundle[] {
+  const { rng } = ctx;
+  return Array.from({ length: count }, (_, i) => {
+    // Quality falls from ~0.76 to ~0.34 across the tier.
+    const quality = clamp(0.76 - (i / (TEAMS_PER_TIER - 1)) * 0.42 + rng.normal(0, 0.06), 0.05, 1);
+    return buildTeam(ctx, tier, quality, names[i % names.length], false);
+  });
+}
+
+/** Build a brand-new world: 5 tiers of 10 teams, the player in the bottom league (Formula Rookie), plus job markets. */
+export function generateWorld(seed: number, player: PlayerSetup, opts: { startTier?: TierId } = {}): GameState {
+  const startTier = opts.startTier ?? STARTING_TIER;
   const rng = createRng(hashSeed(seed, 'world'));
   const ctx = createGenCtx(rng);
   const teams: Record<string, Team> = {};
@@ -196,14 +209,10 @@ export function generateWorld(seed: number, player: PlayerSetup): GameState {
   let nameIdx = 0;
   let playerTeamId = '';
   for (const tier of TIERS) {
-    const teamIds: string[] = [];
-    const aiCount = tier === STARTING_TIER ? TEAMS_PER_TIER - 1 : TEAMS_PER_TIER;
-    for (let i = 0; i < aiCount; i++) {
-      // Earlier names are stronger teams: quality falls from ~0.76 to ~0.34 across the tier.
-      const quality = clamp(0.76 - (i / (TEAMS_PER_TIER - 1)) * 0.42 + rng.normal(0, 0.06), 0.05, 1);
-      teamIds.push(add(buildTeam(ctx, tier, quality, TEAM_NAMES[nameIdx++], false)));
-    }
-    if (tier === STARTING_TIER) {
+    const aiCount = tier === startTier ? TEAMS_PER_TIER - 1 : TEAMS_PER_TIER;
+    const teamIds = generateTier(ctx, tier, TEAM_NAMES.slice(nameIdx, nameIdx + aiCount), aiCount).map(add);
+    nameIdx += TEAMS_PER_TIER;
+    if (tier === startTier) {
       playerTeamId = add(buildTeam(ctx, tier, 0.45, player, true));
       teams[playerTeamId].budget = LEAGUES[tier].startBudget;
       teamIds.push(playerTeamId);
@@ -248,6 +257,7 @@ export function generateWorld(seed: number, player: PlayerSetup): GameState {
     youthPool: [],
     records: emptyRecords(),
     feats: {},
+    side: { season: 1, entered: [], results: {} },
   };
   return refreshYouthPool(initialSponsors(world));
 }

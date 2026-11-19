@@ -4,6 +4,15 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-19: Phase 16 More leagues
+- Five leagues now: Formula Rookie (6 races) and Formula Regional (7) sit below Academy. New careers start in Rookie with $400k. Old saves keep their league and get the two new ones.
+- Side series for Academy, Regional and Rookie teams: Endurance Cup (3 double-length races, two drivers share one car), Street Invitational (one street race, big prize, more crashes), Winter Series (4 short races at season end, young drivers gain experience). Each has an entry fee and running costs.
+- New Leagues screen: the ladder and the side series (enter, schedule, results, last season).
+- 3 new tracks (Fjordbakken, Savanna Speedway, Docklands Street Circuit) and 20 new teams.
+- History's Champions table now shows one column per league.
+- 119 tests pass; browser check (new game and an old save), no console errors.
+- **Next:** push Phases 11-16 to the live game once approved.
+
 ## 2026-11-19: Phase 15 World records and feats
 - New Records screen (sidebar): Record book (most wins, podiums, points, starts, titles, best season, youngest/oldest winner, biggest winning margin), Track records (fastest lap ever per track), and a Feats badge wall.
 - 18 feats for the player, e.g. win from 15th or lower, grand slam, one-two, back-to-back promotions, close shave with money.

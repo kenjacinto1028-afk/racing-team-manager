@@ -64,6 +64,21 @@ export const TRACKS: Track[] = [
     profile: { power: 0.65, downforce: 0.45, tyreWear: 0.4, overtaking: 0.45 },
     path: [[10, 50], [25, 15], [55, 15], [60, 35], [90, 30], [88, 70], [60, 70], [50, 88], [20, 85]],
   },
+  {
+    id: 'fjord', name: 'Fjordbakken', country: 'Norway', laps: 31, baseLapTime: 78, pitLaneTime: 19,
+    profile: { power: 0.35, downforce: 0.7, tyreWear: 0.55, overtaking: 0.6 },
+    path: [[12, 60], [18, 25], [40, 12], [52, 30], [70, 14], [90, 30], [82, 55], [90, 82], [62, 88], [45, 70], [28, 88]],
+  },
+  {
+    id: 'savanna', name: 'Savanna Speedway', country: 'South Africa', laps: 29, baseLapTime: 84, pitLaneTime: 20,
+    profile: { power: 0.75, downforce: 0.3, tyreWear: 0.45, overtaking: 0.3 },
+    path: [[10, 40], [30, 12], [75, 12], [90, 35], [78, 50], [90, 75], [65, 90], [35, 85], [20, 65]],
+  },
+  {
+    id: 'docklands', name: 'Docklands Street Circuit', country: 'Netherlands', laps: 33, baseLapTime: 76, pitLaneTime: 22,
+    profile: { power: 0.4, downforce: 0.65, tyreWear: 0.35, overtaking: 0.8 },
+    path: [[15, 15], [50, 15], [50, 35], [85, 35], [85, 60], [65, 60], [65, 85], [30, 85], [30, 55], [15, 55]],
+  },
 ];
 
 export const TRACK_BY_ID: Record<string, Track> = Object.fromEntries(TRACKS.map((t) => [t.id, t]));

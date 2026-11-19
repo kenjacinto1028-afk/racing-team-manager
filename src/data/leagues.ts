@@ -1,7 +1,12 @@
 import type { TierId } from '../engine/types';
 
-export const TIERS: TierId[] = [1, 2, 3];
-export const STARTING_TIER: TierId = 3;
+export const TIERS: TierId[] = [1, 2, 3, 4, 5];
+/** The lowest league: nobody is relegated from it. */
+export const BOTTOM_TIER: TierId = 5;
+/** New careers start here (Formula Rookie). */
+export const STARTING_TIER: TierId = 5;
+/** Tiers whose teams may enter side championships (Academy and below). */
+export const SIDE_SERIES_TIERS: TierId[] = [3, 4, 5];
 export const TEAMS_PER_TIER = 10;
 export const DRIVERS_PER_TEAM = 2;
 /** Teams promoted from / relegated to each tier at season end. */
@@ -57,5 +62,21 @@ export const LEAGUES: Record<TierId, LeagueDef> = {
     driverSalary: [10_000, 45_000], staffSalary: [5_000, 18_000],
     carRange: [30, 56], driverRange: [34, 64], staffRange: [30, 62],
     upgradeBaseCost: 150_000,
+  },
+  4: {
+    tier: 4, name: 'Formula Regional', short: 'FR', races: 7,
+    startBudget: 750_000, sponsorPerRace: 60_000, pointBonus: 800,
+    prizeMoney: [340e3, 270e3, 220e3, 185e3, 155e3, 130e3, 110e3, 95e3, 80e3, 65e3],
+    driverSalary: [4_000, 20_000], staffSalary: [2_500, 9_000],
+    carRange: [22, 46], driverRange: [27, 56], staffRange: [24, 54],
+    upgradeBaseCost: 75_000,
+  },
+  5: {
+    tier: 5, name: 'Formula Rookie', short: 'FRk', races: 6,
+    startBudget: 400_000, sponsorPerRace: 32_000, pointBonus: 400,
+    prizeMoney: [170e3, 135e3, 110e3, 92e3, 78e3, 66e3, 56e3, 48e3, 40e3, 32e3],
+    driverSalary: [1_500, 9_000], staffSalary: [1_200, 4_500],
+    carRange: [15, 38], driverRange: [20, 48], staffRange: [18, 46],
+    upgradeBaseCost: 38_000,
   },
 };

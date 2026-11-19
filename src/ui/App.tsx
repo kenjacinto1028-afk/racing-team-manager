@@ -14,6 +14,7 @@ import { Development } from './screens/Development';
 import { Finance } from './screens/Finance';
 import { History } from './screens/History';
 import { Records } from './screens/Records';
+import { Leagues } from './screens/Leagues';
 import { Profile } from './screens/Profile';
 import { Glossary } from './screens/Glossary';
 import { NewGame } from './screens/NewGame';
@@ -35,6 +36,7 @@ function screenFor(id: ScreenId): ReactNode {
     case 'review': return <SeasonReview />;
     case 'history': return <History />;
     case 'records': return <Records />;
+    case 'leagues': return <Leagues />;
     case 'profile': return <Profile />;
     case 'glossary': return <Glossary />;
   }

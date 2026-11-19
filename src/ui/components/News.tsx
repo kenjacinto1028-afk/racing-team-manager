@@ -1,12 +1,15 @@
 import { TRACK_BY_ID } from '../../data/tracks';
+import { SIDE_BY_ID } from '../../data/sideSeries';
+import type { SideNews } from '../../engine/sideSeries';
+import { money } from '../format';
 import { FEAT_BY_ID } from '../../data/feats';
 import type { RecordBreak } from '../../engine/records';
 import { DriverLink } from './Links';
 import { Tip } from './Tip';
 
 /** Records that fell and feats unlocked, shown after a race or season. */
-export function NewsBanner({ records = [], feats = [], title }: { records?: RecordBreak[]; feats?: string[]; title?: string }) {
-  if (!records.length && !feats.length) return null;
+export function NewsBanner({ records = [], feats = [], side = [], title }: { records?: RecordBreak[]; feats?: string[]; side?: SideNews[]; title?: string }) {
+  if (!records.length && !feats.length && !side.length) return null;
   return (
     <section className="card news-card">
       {title && <h3>{title}</h3>}
@@ -14,6 +17,12 @@ export function NewsBanner({ records = [], feats = [], title }: { records?: Reco
         <div key={`r${i}`} className="news-row record">
           <span className="news-icon">⏱</span>
           <span><Tip k={r.kind === 'lap' ? 'lapRecord' : 'recordBook'}>{r.label}</Tip>: <DriverLink id={r.driverId} full />, {r.detail} <span className="muted small">at {TRACK_BY_ID[r.trackId]?.name}</span></span>
+        </div>
+      ))}
+      {side.map((n, i) => (
+        <div key={`s${i}`} className="news-row">
+          <span className="news-icon">{SIDE_BY_ID[n.id].icon}</span>
+          <span><Tip k="sideSeries">Side series</Tip>: {n.text}{n.prize ? <> · <b className="good">{money(n.prize, { sign: true })}</b> prize</> : null}</span>
         </div>
       ))}
       {feats.map((id) => FEAT_BY_ID[id] && (

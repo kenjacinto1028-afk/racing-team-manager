@@ -14,7 +14,7 @@ export interface TourStep {
 export const TOUR_STEPS: TourStep[] = [
   {
     title: 'Welcome, Team Principal',
-    body: "You run a small racing team. Hire drivers, improve the car, and win enough points to climb from Formula Academy up to Formula Prime. This 1-minute tour shows you around. You can skip it now and replay it any time from the sidebar.",
+    body: "You run a small racing team. Hire drivers, improve the car, and win enough points to climb five leagues, from Formula Rookie up to Formula Prime. This 1-minute tour shows you around. You can skip it now and replay it any time from the sidebar.",
     screen: 'hq',
   },
   {

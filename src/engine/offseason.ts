@@ -1,4 +1,5 @@
 // Everything that happens between seasons.
+import { emptySide, runWinterSeries, type SideNews } from './sideSeries';
 import { LEAGUES, TIERS, DRIVERS_PER_TEAM } from '../data/leagues';
 import { createRng, hashSeed, type Rng } from './rng';
 import { applyPrizeMoney, askingSalary, capBlocks, upgradeCost, upgradeGain, techDirectorRating } from './finance';
@@ -28,6 +29,8 @@ export interface SeasonReview {
   playerPrize: number;
   retired: string[];
   sponsors: SponsorSeasonResult[];
+  /** Winter Series results, if entered. */
+  sideNews?: SideNews[];
   /** Feats the player unlocked at season end. */
   newFeats?: string[];
 }
@@ -136,7 +139,11 @@ function aiDevelop(state: GameState, team: Team, rng: Rng): Team {
 /** End the season and set up the next. Returns the new state and a summary of what happened. */
 export function runOffseason(input: GameState): { state: GameState; review: SeasonReview } {
   let s = completeAllLeagues(input);
+  // Winter Series (a side championship) runs between the last race and the review.
+  const winter = runWinterSeries(s);
+  s = winter.state;
   const review = previewReview(s);
+  review.sideNews = winter.news;
   // Archive before anything changes: tables, champions, and who drove / worked where.
   s = addToHistory(s);
   const rng = createRng(hashSeed(s.seed, 'offseason', s.season));
@@ -193,7 +200,7 @@ export function runOffseason(input: GameState): { state: GameState; review: Seas
   let market = s.driverMarket.filter((id) => newDrivers[id].age < 34);
   for (const tier of TIERS) {
     for (let i = 0; i < 4; i++) {
-      const d = generateMarketDriver(ctx, tier, { quality: rng.float(0.1, 0.85), age: tier === 3 ? rng.int(16, 19) : undefined });
+      const d = generateMarketDriver(ctx, tier, { quality: rng.float(0.1, 0.85), age: tier >= 3 ? rng.int(15, 19) : undefined });
       newDrivers[d.id] = d;
       market.push(d.id);
     }
@@ -254,6 +261,7 @@ export function runOffseason(input: GameState): { state: GameState; review: Seas
     season: s.season + 1,
     year: s.year + 1,
     nextId: ctx.counter(),
+    side: { ...emptySide(s.season + 1), last: s.side ? { season: s.side.season, entered: s.side.entered, results: s.side.results, winterDone: s.side.winterDone } : undefined },
   };
   // Traits, morale reset, academy graduates, new youth pool (uses nextId, so it runs last).
   s = developOffseason(s, rng);

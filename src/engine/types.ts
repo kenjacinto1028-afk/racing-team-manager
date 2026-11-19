@@ -1,7 +1,7 @@
 // Core game types. Pure data: no functions, no React.
 
 /** 1 = Formula Prime (top), 2 = Formula Challenger, 3 = Formula Academy (bottom). */
-export type TierId = 1 | 2 | 3;
+export type TierId = 1 | 2 | 3 | 4 | 5;
 
 export type Compound = 'soft' | 'medium' | 'hard';
 export type DriverMode = 'push' | 'normal' | 'conserve';
@@ -292,6 +292,19 @@ export interface GameState {
   records: RaceRecords;
   /** The player's unlocked feats: id -> when. */
   feats: Record<string, { season: number; year: number }>;
+  /** Side championships the player entered this season, and their results. */
+  side: SideState;
+}
+
+export type SideSeriesId = 'endurance' | 'street' | 'winter';
+
+export interface SideState {
+  season: number;
+  entered: SideSeriesId[];
+  results: Partial<Record<SideSeriesId, RaceResult[]>>;
+  winterDone?: boolean;
+  /** Last season's side series, kept to show on the Leagues screen. */
+  last?: Omit<SideState, 'last'>;
 }
 
 export interface RecordEntry {

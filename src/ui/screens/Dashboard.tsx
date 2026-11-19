@@ -1,5 +1,5 @@
 import { FEAT_BY_ID } from '../../data/feats';
-import { LEAGUES, MOVE_SPOTS } from '../../data/leagues';
+import { BOTTOM_TIER, LEAGUES, MOVE_SPOTS } from '../../data/leagues';
 import { TRACK_BY_ID } from '../../data/tracks';
 import { BANKRUPT_STREAK, raceSalaries } from '../../engine/finance';
 import { STAFF_ROLES, driverOverall } from '../../engine/generate';
@@ -39,14 +39,17 @@ export function Dashboard() {
   if (openSlots && g.sponsors.offers.length) alerts.push({ kind: 'info', text: `${openSlots} sponsor slot(s) open and ${g.sponsors.offers.length} offer(s) waiting.`, to: 'finance' });
   if (expiring.length) alerts.push({ kind: 'info', text: `${expiring.length} contract(s) end this season. Renew them in the Season Review.` });
   if (!lastRace && lastReview?.season === g.season - 1) {
+    const w = lastReview.sideNews ?? [];
+    if (w.length) alerts.push({ kind: 'info', text: `❄ Winter Series: ${w.map((n) => (n.pos ? `P${n.pos}` : 'DNF')).join(', ')}. Prize money ${money(w.reduce((a, n) => a + n.prize, 0))}.`, to: 'leagues' });
     for (const id of lastReview.newFeats ?? []) if (FEAT_BY_ID[id]) alerts.push({ kind: 'info', text: `${FEAT_BY_ID[id].icon} Feat unlocked last season: ${FEAT_BY_ID[id].name}.`, to: 'records' });
   }
   if (lastRace && lastRace.season === g.season) {
     for (const r of lastRace.records ?? []) alerts.push({ kind: 'info', text: `⏱ ${r.label} at ${TRACK_BY_ID[r.trackId]?.name}: ${g.drivers[r.driverId]?.firstName ?? ''} ${g.drivers[r.driverId]?.lastName ?? ''}, ${r.detail}.`, to: 'records' });
+    for (const n of lastRace.side ?? []) alerts.push({ kind: 'info', text: `${n.text}${n.prize ? ` (${money(n.prize, { sign: true })})` : ''}.`, to: 'leagues' });
     for (const id of lastRace.feats ?? []) if (FEAT_BY_ID[id]) alerts.push({ kind: 'info', text: `${FEAT_BY_ID[id].icon} Feat unlocked: ${FEAT_BY_ID[id].name}.`, to: 'records' });
   }
 
-  const zone = (i: number) => (tier > 1 && i < MOVE_SPOTS ? 'zone-up' : tier < 3 && i >= table.length - MOVE_SPOTS ? 'zone-down' : '');
+  const zone = (i: number) => (tier > 1 && i < MOVE_SPOTS ? 'zone-up' : tier < BOTTOM_TIER && i >= table.length - MOVE_SPOTS ? 'zone-down' : '');
   const snapshot = table.map((r, i) => ({ r, i })).filter(({ r, i }) => i < 5 || r.id === team.id);
   const ledger = [...g.finance.ledger].reverse().slice(0, 8);
 
@@ -89,7 +92,7 @@ export function Dashboard() {
         <div className="card kpi">
           <div className="stat-label"><Tip k="constructors">Championship</Tip></div>
           <div className="stat-value">{round === 0 ? '-' : ordinal(pos)}</div>
-          <div className="kpi-sub">{tier > 1 && pos <= MOVE_SPOTS ? 'Promotion place' : tier < 3 && pos > table.length - MOVE_SPOTS ? 'Relegation zone' : `Top ${MOVE_SPOTS} go up`}</div>
+          <div className="kpi-sub">{tier > 1 && pos <= MOVE_SPOTS ? 'Promotion place' : tier < BOTTOM_TIER && pos > table.length - MOVE_SPOTS ? 'Relegation zone' : `Top ${MOVE_SPOTS} go up`}</div>
         </div>
         <div className="card kpi">
           <div className="stat-label"><Tip k="points">Points</Tip></div>
@@ -108,7 +111,7 @@ export function Dashboard() {
           {alerts.map((a, i) => (
             <div key={i} className={`alert alert-${a.kind}`}>
               <span>{a.text}</span>
-              {a.to && <button className="btn btn-sm" onClick={() => go(a.to!)}>Fix ›</button>}
+              {a.to && <button className="btn btn-sm" onClick={() => go(a.to!)}>{a.kind === 'info' ? 'View' : 'Fix'} ›</button>}
             </div>
           ))}
         </div>
