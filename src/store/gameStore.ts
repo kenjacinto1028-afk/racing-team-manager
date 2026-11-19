@@ -1,0 +1,201 @@
+import { create } from 'zustand';
+import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
+import { buyUpgrade as engineBuyUpgrade } from '../engine/finance';
+import { generateWorld, type PlayerSetup } from '../engine/generate';
+import { hireDriver as engineHireDriver, hireStaff as engineHireStaff, releaseDriver as engineReleaseDriver } from '../engine/market';
+import { previewReview, renewContract as engineRenew, runOffseason, syncOtherLeagues, type SeasonReview } from '../engine/offseason';
+import { applyOrder, raceToResult, simulateToEnd, stepLap, type RaceState } from '../engine/raceSim';
+import { completeRace, prepareWeekend, startRace as engineStartRace, type Weekend } from '../engine/raceSetup';
+import { isLeagueComplete } from '../engine/season';
+import type { CarStat, Compound, DriverMode, GameState, RaceResult, TierId } from '../engine/types';
+
+/** Bump when the saved shape changes. Old saves are reset. */
+export const SAVE_VERSION = 1;
+
+export type RaceSpeed = 1 | 4 | 16;
+
+export interface LastRace {
+  season: number;
+  tier: TierId;
+  round: number;
+  result: RaceResult;
+  budgetBefore: number;
+  budgetAfter: number;
+}
+
+export type ActionResult = { ok: true } | { ok: false; reason: string };
+
+interface Data {
+  saveVersion: number;
+  game: GameState | null;
+  weekend: Weekend | null;
+  race: RaceState | null;
+  raceSpeed: RaceSpeed;
+  lastRace: LastRace | null;
+  lastReview: SeasonReview | null;
+}
+
+export interface GameStore extends Data {
+  newGame: (setup: PlayerSetup, opts?: { seed?: number; pickDriverId?: string }) => void;
+  resetGame: () => void;
+  hireDriver: (driverId: string, years?: number) => ActionResult;
+  releaseDriver: (driverId: string) => ActionResult;
+  hireStaff: (staffId: string, years?: number) => ActionResult;
+  buyUpgrade: (stat: CarStat) => ActionResult;
+  /** Run qualifying for the player's next race. */
+  prepareRace: () => ActionResult;
+  startRace: (startCompounds?: Record<string, Compound>) => ActionResult;
+  tick: () => void;
+  pit: (driverId: string, compound: Compound | null) => void;
+  setMode: (driverId: string, mode: DriverMode) => void;
+  setSpeed: (s: RaceSpeed) => void;
+  skipRace: () => void;
+  finishRace: () => ActionResult;
+  renewContract: (kind: 'driver' | 'staff', id: string, years: number) => void;
+  endSeason: () => ActionResult;
+}
+
+const initial: Data = {
+  saveVersion: SAVE_VERSION, game: null, weekend: null, race: null, raceSpeed: 4, lastRace: null, lastReview: null,
+};
+
+const playerTier = (g: GameState): TierId => g.teams[g.playerTeamId].tier;
+
+/** True when the player's league has run all its races. */
+export function seasonOver(g: GameState): boolean {
+  return isLeagueComplete(g.leagues[playerTier(g)]);
+}
+
+export function createGameStore(storage?: StateStorage, name = 'rtm-save') {
+  return create<GameStore>()(
+    persist(
+      (set, get) => {
+        const withGame = (fn: (g: GameState) => { ok: true; state: GameState } | { ok: false; reason: string }): ActionResult => {
+          const g = get().game;
+          if (!g) return { ok: false, reason: 'No game in progress' };
+          if (get().race) return { ok: false, reason: 'Not during a race' };
+          const r = fn(g);
+          if (!r.ok) return r;
+          set({ game: r.state });
+          return { ok: true };
+        };
+
+        return {
+          ...initial,
+
+          newGame: (setup, opts = {}) => {
+            const seed = opts.seed ?? (Date.now() % 2147483647);
+            let g = generateWorld(seed, setup);
+            if (opts.pickDriverId && g.driverMarket.includes(opts.pickDriverId)) {
+              // Swap out the weaker starting driver for the chosen one, at no fee.
+              const [a, b] = g.teams[g.playerTeamId].driverIds;
+              const weaker = g.drivers[a].pace <= g.drivers[b].pace ? a : b;
+              const rel = engineReleaseDriver({ ...g, teams: { ...g.teams, [g.playerTeamId]: { ...g.teams[g.playerTeamId], budget: 1e12 } } }, g.playerTeamId, weaker);
+              if (rel.ok) {
+                const hired = engineHireDriver(rel.state, g.playerTeamId, opts.pickDriverId, 2, true);
+                if (hired.ok) {
+                  g = { ...hired.state, teams: { ...hired.state.teams, [g.playerTeamId]: { ...hired.state.teams[g.playerTeamId], budget: g.teams[g.playerTeamId].budget } }, finance: g.finance };
+                }
+              }
+            }
+            set({ ...initial, game: g });
+          },
+
+          resetGame: () => set({ ...initial }),
+
+          hireDriver: (id, years) => withGame((g) => engineHireDriver(g, g.playerTeamId, id, years)),
+          releaseDriver: (id) => withGame((g) => engineReleaseDriver(g, g.playerTeamId, id)),
+          hireStaff: (id, years) => withGame((g) => engineHireStaff(g, g.playerTeamId, id, years)),
+          buyUpgrade: (stat) => withGame((g) => engineBuyUpgrade(g, g.playerTeamId, stat)),
+
+          prepareRace: () => {
+            const { game: g, race } = get();
+            if (!g) return { ok: false, reason: 'No game in progress' };
+            if (race) return { ok: false, reason: 'A race is already running' };
+            if (g.finance.bankrupt) return { ok: false, reason: 'The team is bankrupt' };
+            if (g.teams[g.playerTeamId].driverIds.length < 2) return { ok: false, reason: 'You need two drivers to race' };
+            const w = prepareWeekend(g, playerTier(g));
+            if (!w) return { ok: false, reason: 'The season is over' };
+            set({ weekend: w });
+            return { ok: true };
+          },
+
+          startRace: (startCompounds) => {
+            const { game: g, weekend: w } = get();
+            if (!g || !w) return { ok: false, reason: 'Run qualifying first' };
+            const trackId = g.leagues[w.tier].calendar[w.round - 1];
+            const race = engineStartRace(w, trackId, { playerDriverIds: g.teams[g.playerTeamId].driverIds, startCompounds });
+            set({ race });
+            return { ok: true };
+          },
+
+          tick: () => {
+            const r = get().race;
+            if (r && !r.finished) set({ race: stepLap(r) });
+          },
+          pit: (driverId, compound) => {
+            const r = get().race;
+            if (r) set({ race: applyOrder(r, driverId, { pit: compound }) });
+          },
+          setMode: (driverId, mode) => {
+            const r = get().race;
+            if (r) set({ race: applyOrder(r, driverId, { mode }) });
+          },
+          setSpeed: (raceSpeed) => set({ raceSpeed }),
+          skipRace: () => {
+            const r = get().race;
+            if (r) set({ race: simulateToEnd(r) });
+          },
+
+          finishRace: () => {
+            const { game: g, weekend: w, race } = get();
+            if (!g || !w || !race) return { ok: false, reason: 'No race to finish' };
+            if (!race.finished) return { ok: false, reason: 'The race is still running' };
+            const before = g.teams[g.playerTeamId].budget;
+            let next = completeRace(g, w.tier, race, w.round);
+            const after = next.teams[next.playerTeamId].budget;
+            next = syncOtherLeagues(next);
+            set({
+              game: next, race: null, weekend: null,
+              lastRace: { season: g.season, tier: w.tier, round: w.round, result: raceToResult(race, w.round), budgetBefore: before, budgetAfter: after },
+            });
+            return { ok: true };
+          },
+
+          renewContract: (kind, id, years) => {
+            const g = get().game;
+            if (g) set({ game: engineRenew(g, kind, id, years, previewReview(g).playerTierAfter) });
+          },
+
+          endSeason: () => {
+            const g = get().game;
+            if (!g) return { ok: false, reason: 'No game in progress' };
+            if (!seasonOver(g)) return { ok: false, reason: 'The season is not finished' };
+            const { state, review } = runOffseason(g);
+            set({ game: state, lastReview: review, lastRace: null, weekend: null, race: null });
+            return { ok: true };
+          },
+        };
+      },
+      {
+        name,
+        version: SAVE_VERSION,
+        storage: createJSONStorage(() => storage ?? localStorage),
+        partialize: (s): Data => ({
+          saveVersion: s.saveVersion, game: s.game, weekend: s.weekend, race: s.race,
+          raceSpeed: s.raceSpeed, lastRace: s.lastRace, lastReview: s.lastReview,
+        }),
+        // Old save shape: start fresh rather than crash.
+        migrate: () => ({ ...initial }) as unknown as GameStore,
+      },
+    ),
+  );
+}
+
+export const useGame = createGameStore();
+
+/** Season review preview for the current (finished) season. */
+export function currentReview(g: GameState): SeasonReview {
+  return previewReview(g);
+}
+
