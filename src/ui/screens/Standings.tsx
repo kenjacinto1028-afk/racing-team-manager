@@ -90,7 +90,7 @@ export function Standings() {
                 const mine = res?.entries.filter((e) => e.teamId === team.id).sort((a, b) => a.position - b.position)[0];
                 const pole = res?.entries.find((e) => e.grid === 1);
                 return (
-                  <tr key={tid} className={i === L.results.length ? 'next' : ''}>
+                  <tr key={tid} className={(i === L.results.length ? 'next' : '') + (win?.teamId === team.id ? ' me' : '')}>
                     <td>{i + 1}</td>
                     <td className="muted">Wk {L.weeks[i]}</td>
                     <td><b>{t.name}</b> <span className="muted small">{t.country}</span></td>

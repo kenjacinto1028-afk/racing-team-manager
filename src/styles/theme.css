@@ -15,6 +15,8 @@
   /* Accents */
   --accent: #e10600;          /* racing red; replaced by team colour later */
   --accent-soft: rgba(225, 6, 0, 0.14);
+  --accent-hi: color-mix(in srgb, var(--accent) 70%, white);
+  --accent-line: color-mix(in srgb, var(--accent) 35%, transparent);
   --team-secondary: #ffffff;
   --good: #2fd27e;
   --warn: #ffb020;
@@ -211,8 +213,12 @@ table.data th.sorted { color: var(--text); }
 table.data td.empty { text-align: center; color: var(--text-faint); padding: var(--s-6); }
 table.data tr.clickable { cursor: pointer; }
 table.data.compact td { padding: 8px var(--s-2); }
-table.data tr.me td { background: var(--accent-soft); }
-table.data tr.me td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+/* Your team's rows: team-colour tint, accent edge, bold names. --accent-hi keeps dark team colours visible. */
+table.data tr.me td { background: var(--accent-soft); color: var(--text); border-top: 1px solid var(--accent-line); border-bottom: 1px solid var(--accent-line); }
+table.data tr.me td:first-child { box-shadow: inset 4px 0 0 var(--accent-hi); }
+table.data tr.me .name-link, table.data tr.me .team-name { font-weight: 700; color: var(--text); }
+table.data tr.me .name-link b { color: var(--accent-hi); }
+table.data tr.me:hover td { background: color-mix(in srgb, var(--accent) 24%, transparent); }
 table.data tr.zone-up td:first-child { box-shadow: inset 3px 0 0 var(--good); }
 table.data tr.zone-down td:first-child { box-shadow: inset 3px 0 0 var(--bad); }
 table.data tr.next td { background: rgba(255,255,255,.03); }
@@ -374,7 +380,10 @@ table.data tr.next td { background: rgba(255,255,255,.03); }
 .tower-list { list-style: none; margin: 0; padding: 4px 0; }
 .tower-row { display: grid; grid-template-columns: 30px 4px 1fr 82px 52px 34px; align-items: center; gap: 8px; padding: 2px 12px; height: 25px; font-size: 13px; }
 .tower-row:nth-child(even) { background: rgba(255,255,255,.015); }
-.tower-row.me { background: var(--accent-soft); }
+.tower-row.me { background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 30%, transparent), var(--accent-soft)); box-shadow: inset 3px 0 0 var(--accent-hi); }
+.tower-row.me .tw-name { color: var(--accent-hi); font-weight: 800; }
+.tower-row.me .tw-name::after { content: 'YOU'; margin-left: 6px; font-size: 9px; letter-spacing: .12em; vertical-align: middle; padding: 1px 4px; border-radius: 3px; background: var(--accent-hi); color: #0b0d12; }
+.tower-row.me .tw-gap { color: var(--text); }
 .tower-row.out { opacity: .4; }
 .tw-pos { font-family: var(--font-display); font-weight: 700; font-size: 16px; text-align: center; }
 .tw-bar { width: 4px; height: 18px; border-radius: 2px; }
@@ -412,7 +421,7 @@ table.data tr.next td { background: rgba(255,255,255,.03); }
 .feed-card { display: flex; flex-direction: column; min-height: 0; }
 .feed { list-style: none; margin: 0; padding: 0; overflow-y: auto; max-height: 260px; font-size: 13px; }
 .feed li { padding: 6px 0; border-bottom: 1px solid var(--border); color: var(--text-dim); }
-.feed li.mine { color: var(--text); }
+.feed li.mine { color: var(--text); box-shadow: inset 3px 0 0 var(--accent-hi); padding-left: 8px; background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .feed-lap { display: inline-block; min-width: 34px; font-family: var(--font-display); font-weight: 700; color: var(--text-faint); }
 .feed-overtake { }
 .feed-dnf { color: var(--bad) !important; }

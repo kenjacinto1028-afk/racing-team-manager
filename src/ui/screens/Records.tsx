@@ -49,13 +49,13 @@ export function Records() {
       ]} />
       {tab === 'book' && (
         <section className="card">
-          <DataTable rows={book} columns={bookCols} rowKey={(r) => r.id} />
+          <DataTable rows={book} columns={bookCols} rowKey={(r) => r.id} rowClass={(r) => (r.holder && (r.holderKind === 'team' ? r.holder : g.drivers[r.holder]?.teamId) === g.playerTeamId ? 'me' : undefined)} />
           <p className="muted small" style={{ marginTop: 12 }}>Counts every league and every season, including the one in progress. Titles count once a season is finished.</p>
         </section>
       )}
       {tab === 'tracks' && (
         <section className="card">
-          <DataTable rows={TRACKS} columns={trackCols} rowKey={(t) => t.id} initialSort={{ key: 'track', dir: 'asc' }} />
+          <DataTable rows={TRACKS} columns={trackCols} rowKey={(t) => t.id} rowClass={(t) => (g.records.trackLaps[t.id]?.teamId === g.playerTeamId ? 'me' : undefined)} initialSort={{ key: 'track', dir: 'asc' }} />
         </section>
       )}
       {tab === 'feats' && (

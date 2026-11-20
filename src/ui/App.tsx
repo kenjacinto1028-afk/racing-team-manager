@@ -74,7 +74,7 @@ function Shell() {
     const root = document.documentElement.style;
     root.setProperty('--accent', team.colors.primary);
     root.setProperty('--team-secondary', team.colors.secondary);
-    root.setProperty('--accent-soft', `color-mix(in srgb, ${team.colors.primary} 16%, transparent)`);
+    root.setProperty('--accent-soft', `color-mix(in srgb, ${team.colors.primary} 18%, transparent)`);
   }, [team.colors.primary, team.colors.secondary]);
 
   return (

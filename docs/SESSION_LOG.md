@@ -4,6 +4,14 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-20: QoL Highlight your drivers
+- Your team's rows now stand out everywhere: team-colour tint, a bright edge bar, bold names. A lighter shade of the team colour keeps dark team colours visible.
+- Live timing tower: your cars get a "YOU" tag and coloured names. Commentary lines about your team get an edge bar.
+- Also highlighted: calendar rounds your team won, Records rows held by your team or drivers.
+- 119 tests pass; browser check (qualifying, live race, results, standings), no console errors.
+- Pushed live.
+- **Next:** nothing planned.
+
 ## 2026-11-19: Phase 16 More leagues
 - Five leagues now: Formula Rookie (6 races) and Formula Regional (7) sit below Academy. New careers start in Rookie with $400k. Old saves keep their league and get the two new ones.
 - Side series for Academy, Regional and Rookie teams: Endurance Cup (3 double-length races, two drivers share one car), Street Invitational (one street race, big prize, more crashes), Winter Series (4 short races at season end, young drivers gain experience). Each has an entry fee and running costs.

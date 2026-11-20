@@ -1,7 +1,7 @@
 # Progress
 
-**Current phase:** Phases 10-16 done and live. Next: nothing planned yet
-**Last updated:** 2026-11-19
+**Current phase:** Phases 10-16 done and live, plus QoL updates. Next: nothing planned yet
+**Last updated:** 2026-11-20
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
 Tick each box when it's done. Update "Current phase" and add an entry to `docs/SESSION_LOG.md` at the end of each session.
@@ -133,3 +133,6 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 - Balance is first-pass. Watch whether Academy feels too easy or too hard over 2-3 seasons and tune `engine/performance.ts` and `data/leagues.ts`.
 - Old drivers who drop out of the market stay in the save file (small, but grows slowly over many seasons).
 - `node_modules` can't be installed inside `/mnt/project-files` (that folder blocks the links npm needs). Run `npm install` in a normal folder; the project's source is synced to `/mnt/project-files`.
+
+## QoL updates
+- [x] Highlight your team's drivers and team in every ranking table (live timing tower, commentary, qualifying, results, standings, side series, calendar winners, records)
