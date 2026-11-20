@@ -4,6 +4,15 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-20: QoL Live race screen upgrade
+- Mockups approved first (saved in project files: `screenshots/race-map-mockup*.png`, `timing-tower-laps-mockup.png`, `live-race-screen-mockup.png`).
+- Race map: number badge per car, clearly different team colours (look-alike colours swapped for a palette colour; your team keeps its own), wider road with two lanes so side-by-side cars show, bunched cars spread into rows of two, chequered start/finish line, pit lane outside the track with IN/OUT signs and team garages, sector lines, dashed rings on the 3 closest battles, YOU and P1 tags.
+- Timing list: car number, full surname, LAP column (amber when lapped, PIT while in the pit lane), "+1 LAP" instead of a huge time gap.
+- New Team battle list: points each team would score if the race ended now; rows slide when the order changes, with ▲/▼ for the change since last lap.
+- Layout: map and your two driver cards on the left, timing list and team battle on the right, commentary full width. Below 1200 px the map goes full width.
+- New `engine/raceView.ts` (car numbers, colours, laps down, team battle) with 6 tests. 125 tests pass; browser check at 1440 and 1024 px, all 15 tracks drawn, no console errors.
+- **Next:** push live once approved; then visual effects (Kenneth to pick) and sound.
+
 ## 2026-11-20: QoL Highlight your drivers
 - Your team's rows now stand out everywhere: team-colour tint, a bright edge bar, bold names. A lighter shade of the team colour keeps dark team colours visible.
 - Live timing tower: your cars get a "YOU" tag and coloured names. Commentary lines about your team get an edge bar.

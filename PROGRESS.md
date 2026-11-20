@@ -1,6 +1,6 @@
 # Progress
 
-**Current phase:** Phases 10-16 done and live, plus QoL updates. Next: nothing planned yet
+**Current phase:** QoL: live race screen upgrade built, waiting to go live. Next: visual effects and sound
 **Last updated:** 2026-11-20
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
@@ -136,3 +136,7 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 
 ## QoL updates
 - [x] Highlight your team's drivers and team in every ranking table (live timing tower, commentary, qualifying, results, standings, side series, calendar winners, records)
+- [x] Live race screen upgrade: bigger map with car numbers, clearly different team colours, wide two-lane road, chequered start/finish line, pit lane with garages, sector lines, battle rings; lap column in the timing list; live Team battle list; new layout
+- [ ] Push the live race screen upgrade to the live game (waiting for approval)
+- [ ] Visual effects elsewhere (start lights, confetti, count-ups, etc.): waiting for Kenneth to pick
+- [ ] Sound: engine sound made in the browser, free CC0 effects, mute and volume control

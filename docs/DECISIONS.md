@@ -4,6 +4,10 @@ Record every design or technical decision here, newest first, so future sessions
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-11-20 | Live race screen: map left (big), timing list + Team battle stacked on the right, driver cards under the map | Kenneth wanted the map bigger and team battle beside the driver rankings |
+| 2026-11-20 | Car numbers come from a hash of the driver id (2-99, unique in the race) | Each driver keeps the same number across races without a save change |
+| 2026-11-20 | Race colours: two teams closer than a set colour distance get a palette colour instead; the player always keeps their own | Every team must be easy to tell apart on the map |
+| 2026-11-20 | Map spreads bunched cars into rows of two (shown slightly apart) | Keeps every number readable in a train of cars; true order is in the timing list |
 | 2026-11-19 | Side series money scales with your league's sponsor income; entry fee + running costs mean only a top-5 finish usually pays | A choice, not free money |
 | 2026-11-19 | Side races are simulated instantly after the matching league round (Winter Series at season end), not watched live | Keeps the season moving; results show as headlines |
 | 2026-11-19 | Endurance Cup: one car per team, the two drivers' skills averaged | Simple way to model drivers sharing a car |

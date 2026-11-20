@@ -9,6 +9,8 @@ import { DataTable, type Column } from '../components/DataTable';
 import { TimingTower, TyreBadge } from '../components/TimingTower';
 import { Tip } from '../components/Tip';
 import { TrackMap } from '../components/TrackMap';
+import { TeamBattle } from '../components/TeamBattle';
+import { useRaceLook } from '../raceLook';
 import { TrackProfile } from '../components/TrackProfile';
 import { SetupPanel } from '../components/SetupPanel';
 import { unitAllowance } from '../../engine/car';
@@ -193,6 +195,7 @@ function LiveRace({ race, g, team }: { race: RaceState; g: GameState; team: Team
   const [paused, setPaused] = useState(false);
   const [feedMine, setFeedMine] = useState(false);
   const phase = useRaceClock(race, speed, paused);
+  const look = useRaceLook(race, g.teams, team.id);
   const rec = g.records?.trackLaps?.[race.track.id];
   const recordPace = rec && race.fastestLap && race.fastestLap.time < rec.value ? rec : null;
   const mine = race.cars.filter((c) => c.c.teamId === team.id);
@@ -227,16 +230,25 @@ function LiveRace({ race, g, team }: { race: RaceState; g: GameState; team: Team
       <div className="lap-progress"><i style={{ width: `${((race.lap + phase) / race.totalLaps) * 100}%` }} /></div>
 
       <div className="race-grid">
-        <section className="card map-card">
-          <TrackMap track={race.track} race={race} teams={g.teams} playerTeamId={team.id} progress={phase} />
-        </section>
-        <section className="card tower-card">
-          <TimingTower race={race} teams={g.teams} playerTeamId={team.id} />
-        </section>
+        <div className="race-left">
+          <section className="card map-card">
+            <TrackMap track={race.track} race={race} teams={g.teams} playerTeamId={team.id} progress={phase} look={look} />
+          </section>
+          <div className="race-pitwalls">
+            {mine.map((car) => <PitWall key={car.c.driverId} car={car} race={race} position={order(race.cars).indexOf(car) + 1} />)}
+          </div>
+        </div>
+        <div className="race-right">
+          <section className="card tower-card">
+            <TimingTower race={race} teams={g.teams} playerTeamId={team.id} look={look} />
+          </section>
+          <section className="card tb-card">
+            <TeamBattle race={race} teams={g.teams} playerTeamId={team.id} look={look} />
+          </section>
+        </div>
       </div>
 
       <div className="race-grid-bottom">
-        {mine.map((car) => <PitWall key={car.c.driverId} car={car} race={race} position={order(race.cars).indexOf(car) + 1} />)}
         <section className="card feed-card">
           <div className="card-head">
             <h3><Tip k="commentary">Commentary</Tip></h3>
