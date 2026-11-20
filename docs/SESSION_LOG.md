@@ -11,7 +11,8 @@ Add one entry at the end of each work session, newest first.
 - New Team battle list: points each team would score if the race ended now; rows slide when the order changes, with ▲/▼ for the change since last lap.
 - Layout: map and your two driver cards on the left, timing list and team battle on the right, commentary full width. Below 1200 px the map goes full width.
 - New `engine/raceView.ts` (car numbers, colours, laps down, team battle) with 6 tests. 125 tests pass; browser check at 1440 and 1024 px, all 15 tracks drawn, no console errors.
-- **Next:** push live once approved; then visual effects (Kenneth to pick) and sound.
+- Pushed live.
+- **Next:** visual effects (Kenneth to pick) and sound.
 
 ## 2026-11-20: QoL Highlight your drivers
 - Your team's rows now stand out everywhere: team-colour tint, a bright edge bar, bold names. A lighter shade of the team colour keeps dark team colours visible.
