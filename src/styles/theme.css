@@ -157,7 +157,7 @@ table.data tbody tr:hover { background: var(--surface-2); }
 .bad { color: var(--bad); }
 .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.grid-2-1 { grid-template-columns: 2fr 1fr; }
+.grid-2-1 { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
 .card-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); margin-bottom: var(--s-3); }
 .card-head h3 { margin: 0; }
 
@@ -675,3 +675,22 @@ tr.slot-first td { border-top: 1px solid var(--border-strong); }
   .ladder-rung > .btn { display: none; }
 }
 .side-results .list-row { flex-direction: column; align-items: flex-start; gap: 2px; }
+
+/* ---- Quality-of-life: save backup, finance notes, confirm dialog ---- */
+.save-backup { display: flex; flex-direction: column; gap: var(--s-2); }
+.save-backup-buttons { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center; }
+.save-backup.compact .save-backup-buttons { flex-direction: column; align-items: flex-start; }
+.save-note { font-size: 12px; }
+.save-note.good { color: var(--good); }
+.save-note.bad { color: var(--bad); }
+
+.fin-row > span { display: flex; flex-direction: column; gap: 2px; }
+.fin-note { font-size: 12px; font-weight: 400; color: var(--text-faint); }
+.fin-msg { margin-top: var(--s-3); padding: 10px 12px; border-radius: var(--radius-sm); font-size: 13px; border: 1px solid var(--border); }
+.fin-msg.bad { background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--text); }
+.fin-msg.warn { background: color-mix(in srgb, var(--warn) 14%, transparent); color: var(--text); }
+
+.confirm-modal { text-align: left; align-items: stretch; max-width: 420px; }
+.confirm-modal h2 { margin: 0; }
+.confirm-modal .confirm-body p { color: var(--text-dim); margin: 0; }
+.confirm-modal .btn-row { justify-content: flex-end; }

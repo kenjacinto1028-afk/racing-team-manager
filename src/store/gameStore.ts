@@ -82,6 +82,12 @@ export interface GameStore extends Data {
   setSpeed: (s: RaceSpeed) => void;
   skipRace: () => void;
   finishRace: () => ActionResult;
+  /** Run the player's next race start to finish in one go (qualifying, race, payout). */
+  simNextRace: () => ActionResult;
+  /** Save file as text (the same shape the browser keeps). */
+  exportSave: () => string;
+  /** Load a save file's text. Old versions are upgraded; bad files are refused and the current save is kept. */
+  importSave: (json: string) => ActionResult;
   renewContract: (kind: 'driver' | 'staff', id: string, years: number) => void;
   endSeason: () => ActionResult;
 }
@@ -228,6 +234,53 @@ export function createGameStore(storage?: StateStorage, name = 'rtm-save') {
             set({
               game: next, race: null, weekend: null,
               lastRace: { season: g.season, tier: w.tier, round: w.round, result, budgetBefore: before, budgetAfter: after, records: done.broken, feats: fe.unlocked, side: sideRun.news },
+            });
+            return { ok: true };
+          },
+
+          simNextRace: () => {
+            const { game: g, race } = get();
+            if (!g) return { ok: false, reason: 'No game in progress' };
+            if (race) return { ok: false, reason: 'A race is already running' };
+            if (seasonOver(g)) return { ok: false, reason: 'The season is over' };
+            if (!get().weekend) {
+              const p = get().prepareRace();
+              if (!p.ok) return p;
+            }
+            const s = get().startRace();
+            if (!s.ok) return s;
+            get().skipRace();
+            return get().finishRace();
+          },
+
+          exportSave: () => {
+            const s = get();
+            return JSON.stringify({
+              app: 'racing-team-manager',
+              version: SAVE_VERSION,
+              state: { saveVersion: s.saveVersion, game: s.game, weekend: s.weekend, race: s.race, raceSpeed: s.raceSpeed, lastRace: s.lastRace, lastReview: s.lastReview },
+            });
+          },
+
+          importSave: (json) => {
+            let parsed: { state?: Record<string, unknown>; version?: unknown } | null;
+            try { parsed = JSON.parse(json); } catch { return { ok: false, reason: 'That file is not a valid save.' }; }
+            const st = parsed?.state;
+            if (!st || typeof st !== 'object' || !(st as { game?: unknown }).game) {
+              return { ok: false, reason: 'That file is not a Racing Team Manager save.' };
+            }
+            const version = typeof parsed?.version === 'number' ? parsed.version : 1;
+            let m: Record<string, any> | null;
+            try { m = migrateSave(st, version); } catch { m = null; }
+            if (!m || !m.game) return { ok: false, reason: `This save could not be loaded (version ${version}).` };
+            set({
+              saveVersion: SAVE_VERSION,
+              game: m.game,
+              weekend: m.weekend ?? null,
+              race: m.race ?? null,
+              raceSpeed: m.raceSpeed ?? 4,
+              lastRace: m.lastRace ?? null,
+              lastReview: m.lastReview ?? null,
             });
             return { ok: true };
           },

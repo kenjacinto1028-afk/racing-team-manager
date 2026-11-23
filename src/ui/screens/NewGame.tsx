@@ -5,6 +5,7 @@ import { useGame } from '../../store/gameStore';
 import { FLAG, money } from '../format';
 import { Rating, StatBar } from '../components/StatBar';
 import { Tip } from '../components/Tip';
+import { SaveBackup } from '../components/SaveBackup';
 
 const PALETTE = ['#e10600', '#ff8000', '#ffd400', '#2ecc71', '#00a19c', '#1e90ff', '#3a2bd6', '#8e44ad', '#ff6fa8', '#c0c6cf', '#ffffff', '#111111'];
 
@@ -90,6 +91,7 @@ export function NewGame() {
 
         <div className="newgame-foot">
           <button className="btn btn-primary btn-lg" disabled={!valid} onClick={start}>Start career ›</button>
+          <div className="muted small"><div style={{ marginBottom: 6 }}>Have a save backup?</div><SaveBackup /></div>
         </div>
       </div>
     </div>

@@ -4,6 +4,10 @@ Record every design or technical decision here, newest first, so future sessions
 
 | Date | Decision | Why |
 |---|---|---|
+| 2026-11-23 | Sim buttons run qualifying, race and payout with the default auto strategy (mandatory stop only, no pit calls) | Quick play; the player still owns strategy in a watched race |
+| 2026-11-23 | Save backup is a plain JSON file download with the same shape the browser stores; loading runs the normal upgrade steps | Simple, no server; keeps old backups usable |
+| 2026-11-23 | Releasing a driver or staff member uses a modal confirm, not a two-click button | Settlement cost is a real money decision, so it needs a clear question |
+| 2026-11-23 | Plain arrow keys switch screens, but not while typing, in the tutorial or with a dialog open | Arrows are used by the tutorial and by text fields |
 | 2026-11-20 | Live race screen: map left (big), timing list + Team battle stacked on the right, driver cards under the map | Kenneth wanted the map bigger and team battle beside the driver rankings |
 | 2026-11-20 | Car numbers come from a hash of the driver id (2-99, unique in the race) | Each driver keeps the same number across races without a save change |
 | 2026-11-20 | Race colours: two teams closer than a set colour distance get a palette colour instead; the player always keeps their own | Every team must be easy to tell apart on the map |

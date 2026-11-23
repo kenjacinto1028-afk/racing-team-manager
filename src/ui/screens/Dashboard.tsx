@@ -5,7 +5,7 @@ import { BANKRUPT_STREAK, raceSalaries } from '../../engine/finance';
 import { STAFF_ROLES, driverOverall } from '../../engine/generate';
 import { teamStandings } from '../../engine/season';
 import { seasonOver, useGame } from '../../store/gameStore';
-import { Pos, TeamName } from '../components/bits';
+import { Pos, TeamName, useFlash } from '../components/bits';
 import { Rating } from '../components/StatBar';
 import { Tip } from '../components/Tip';
 import { TrackProfile } from '../components/TrackProfile';
@@ -19,6 +19,8 @@ export function Dashboard() {
   const lastRace = useGame((s) => s.lastRace);
   const lastReview = useGame((s) => s.lastReview);
   const { go } = useNav();
+  const sim = useGame((s) => s.simNextRace);
+  const [flash, show] = useFlash();
   const L = g.leagues[tier];
   const table = teamStandings(L);
   const pos = table.findIndex((r) => r.id === team.id) + 1;
@@ -65,10 +67,14 @@ export function Dashboard() {
           {over ? (
             <button className="btn btn-primary btn-lg" onClick={() => go('review')}>Season review ›</button>
           ) : (
-            <button className="btn btn-primary btn-lg" onClick={() => go('race')}>Race weekend ›</button>
+            <>
+              <button className="btn btn-lg" title="Run qualifying and the next race now, then show the result" onClick={() => { const r = sim(); if (r.ok) go('race'); else show(r.reason, 'bad'); }}>Sim to next race ⏭</button>
+              <button className="btn btn-primary btn-lg" onClick={() => go('race')}>Race weekend ›</button>
+            </>
           )}
         </div>
       </div>
+      {flash}
 
       {lastReview && lastReview.season === g.season - 1 && round === 0 && (
         <div className={'alert ' + (lastReview.playerTierAfter < lastReview.playerTierBefore ? 'alert-good' : lastReview.playerTierAfter > lastReview.playerTierBefore ? 'alert-bad' : 'alert-info')}>

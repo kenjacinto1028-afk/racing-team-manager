@@ -4,6 +4,17 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-23: QoL quality-of-life pack
+- Sim buttons: "Sim to next race" on HQ and after a result, "Sim this race" before qualifying. Each runs qualifying, the race and the payout in one go. "Skip to end" in the live race is now "Skip to my result".
+- Save backup: "Save backup" downloads a save file; "Load backup" reads one back (sidebar, and on the New Game screen). Old save versions are upgraded on load; files that aren't saves are refused and the current game is kept.
+- Releasing a driver or staff member now opens a confirm dialog showing the settlement cost and morale hit (Esc or Keep cancels).
+- Left and right arrows move back and forward (Alt+arrows still work). Ignored while typing, during the tutorial and with a dialog open.
+- Finance notes in the race debrief: every money line explained in plain English, money in/out, net, and a warning when the budget is low or negative.
+- Layout fix: the two-column race pages no longer push the right column off screen at 1280 px.
+- 129 tests pass (4 new in `store/__tests__/saveFile.test.ts`). Browser check: sim, arrows, dialog, backup download and load, bad file message, no console errors at 1280 and 1024 px.
+- Not committed yet, waiting for Kenneth's go-ahead.
+- **Next:** commit and push when approved; then visual effects (Kenneth to pick) and sound.
+
 ## 2026-11-20: QoL Live race screen upgrade
 - Mockups approved first (saved in project files: `screenshots/race-map-mockup*.png`, `timing-tower-laps-mockup.png`, `live-race-screen-mockup.png`).
 - Race map: number badge per car, clearly different team colours (look-alike colours swapped for a palette colour; your team keeps its own), wider road with two lanes so side-by-side cars show, bunched cars spread into rows of two, chequered start/finish line, pit lane outside the track with IN/OUT signs and team garages, sector lines, dashed rings on the 3 closest battles, YOU and P1 tags.

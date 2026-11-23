@@ -4,7 +4,8 @@ import { releaseCost, staffOffer } from '../../engine/market';
 import { courseCost } from '../../engine/development';
 import type { Staff as StaffT, StaffRole } from '../../engine/types';
 import { useGame } from '../../store/gameStore';
-import { ConfirmButton, Tabs, useFlash } from '../components/bits';
+import { Tabs, useFlash } from '../components/bits';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DataTable, type Column } from '../components/DataTable';
 import { Rating, StatBar } from '../components/StatBar';
 import { Tip } from '../components/Tip';
@@ -27,6 +28,7 @@ export function Staff() {
   const course = useGame((s) => s.sendOnCourse);
   const racing = useGame((s) => !!s.race);
   const [role, setRole] = useState<StaffRole | 'all'>('all');
+  const [releasing, setReleasing] = useState<string | null>(null);
   const [flash, show] = useFlash();
 
   const market = useMemo(() => g.staffMarket.map((id) => ({ s: g.staff[id], ...staffOffer(g, team.id, id) })), [g, team.id]);
@@ -85,10 +87,25 @@ export function Staff() {
                   {(() => {
                     const cost = s.contract ? releaseCost(s.contract.salary, s.contract.yearsLeft) : 0;
                     return (
-                      <ConfirmButton className="btn btn-sm btn-ghost" disabled={racing || cost > team.budget} confirmText={`Settle ${money(cost)}? Morale -4`}
-                        onConfirm={() => { const res = release(s.id); show(res.ok ? `${s.name} released.` : res.reason, res.ok ? 'good' : 'bad'); }}>
-                        Release
-                      </ConfirmButton>
+                      <>
+                        <button className="btn btn-sm btn-ghost" disabled={racing || cost > team.budget} onClick={() => setReleasing(s.id)}>Release</button>
+                        {releasing === s.id && (
+                          <ConfirmDialog
+                            title={`Release ${s.name}?`}
+                            confirmLabel="Release"
+                            danger
+                            onCancel={() => setReleasing(null)}
+                            onConfirm={() => {
+                              const res = release(s.id);
+                              setReleasing(null);
+                              show(res.ok ? `${s.name} released.` : res.reason, res.ok ? 'good' : 'bad');
+                            }}
+                          >
+                            <p>Ending the contract early costs a settlement of <b>{money(cost)}</b>, paid now.</p>
+                            <p className="muted small">Team morale drops by 4. The {ROLE_LABEL[s.role]} post stays empty until you hire someone.</p>
+                          </ConfirmDialog>
+                        )}
+                      </>
                     );
                   })()}
                 </>

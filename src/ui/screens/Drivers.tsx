@@ -4,7 +4,8 @@ import { driverOffer, releaseCost } from '../../engine/market';
 import { willingToJoin } from '../../engine/finance';
 import type { Driver } from '../../engine/types';
 import { useGame } from '../../store/gameStore';
-import { ConfirmButton, Empty, Tabs, useFlash } from '../components/bits';
+import { Empty, Tabs, useFlash } from '../components/bits';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DataTable, type Column } from '../components/DataTable';
 import { Rating, StatBar } from '../components/StatBar';
 import { Tip } from '../components/Tip';
@@ -37,6 +38,7 @@ export function Drivers() {
   const [afford, setAfford] = useState(false);
   const [flash, show] = useFlash();
   const [talks, setTalks] = useState<Driver | null>(null);
+  const [releasing, setReleasing] = useState<string | null>(null);
   const potStr = (d: Driver) => { const p = potentialRange(g, d); return p.exact ? String(p.lo) : `${p.lo}-${p.hi}`; };
 
   const mine = team.driverIds.map((id) => g.drivers[id]);
@@ -122,10 +124,23 @@ export function Drivers() {
                     ? <span><Tip k="payDriver">Brings</Tip> <b className="good">{money(-(d.contract?.salary ?? 0))}</b>/race</span>
                     : <span><Tip k="salary">Salary</Tip> <b>{money(d.contract?.salary ?? 0)}</b>/race{d.contract?.winBonus ? <span className="muted"> · win +{money(d.contract.winBonus)}</span> : null}{d.contract?.podiumBonus ? <span className="muted"> · podium +{money(d.contract.podiumBonus)}</span> : null}</span>}
                   <span><Tip k="contract">Contract</Tip> <b>{d.contract?.yearsLeft ?? 0}</b> season(s)</span>
-                  <ConfirmButton className="btn btn-sm" disabled={racing || cost > team.budget} confirmText={`Settle ${money(cost)}? Morale -8`}
-                    onConfirm={() => { const r = release(d.id); show(r.ok ? `${d.lastName} released.` : r.reason, r.ok ? 'good' : 'bad'); }}>
-                    Release
-                  </ConfirmButton>
+                  <button className="btn btn-sm" disabled={racing || cost > team.budget} onClick={() => setReleasing(d.id)}>Release</button>
+                  {releasing === d.id && (
+                    <ConfirmDialog
+                      title={`Release ${d.firstName} ${d.lastName}?`}
+                      confirmLabel="Release driver"
+                      danger
+                      onCancel={() => setReleasing(null)}
+                      onConfirm={() => {
+                        const r = release(d.id);
+                        setReleasing(null);
+                        show(r.ok ? `${d.lastName} released.` : r.reason, r.ok ? 'good' : 'bad');
+                      }}
+                    >
+                      <p>Ending the contract early costs a settlement of <b>{money(cost)}</b>, paid now.</p>
+                      <p className="muted small">Team morale drops by 8. The seat stays empty until you sign someone else.</p>
+                    </ConfirmDialog>
+                  )}
                 </div>
               </section>
             );
