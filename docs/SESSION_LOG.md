@@ -4,6 +4,13 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-23: Track preview before every race
+- New `TrackPreview` card (stat bars, slow/medium/fast corner count, plain-English tyre, stop and passing advice) on the race weekend, qualifying and results ("Next race") screens, so strategy can be planned for every round.
+- New `engine/trackInfo.ts` (corner counts from the track shape, strategy hints) with tests. 127 tests pass; no console errors.
+- Next: not pushed yet; waiting for Kenneth's OK.
+
+---
+
 ## 2026-11-20: QoL Live race screen upgrade
 - Mockups approved first (saved in project files: `screenshots/race-map-mockup*.png`, `timing-tower-laps-mockup.png`, `live-race-screen-mockup.png`).
 - Race map: number badge per car, clearly different team colours (look-alike colours swapped for a palette colour; your team keeps its own), wider road with two lanes so side-by-side cars show, bunched cars spread into rows of two, chequered start/finish line, pit lane outside the track with IN/OUT signs and team garages, sector lines, dashed rings on the 3 closest battles, YOU and P1 tags.

@@ -78,6 +78,7 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
   mandatoryStop: { term: 'Mandatory stop', category: 'Racing', short: 'Every car must pit at least once. If you forget, the team calls your driver in on the second-to-last lap.' },
   trackPower: { term: 'Power (track)', category: 'Racing', short: 'How much the track has long straights. High power means engine matters most.' },
   trackDownforce: { term: 'Downforce (track)', category: 'Racing', short: 'How twisty the track is. High downforce means aero matters most.' },
+  corners: { term: 'Corners', category: 'Racing', short: 'Slow corners are tight hairpins (aero and grip matter), fast corners are gentle sweeps (bravery and downforce matter).' },
   trackTyreWear: { term: 'Tyre wear (track)', category: 'Racing', short: 'How hard the track surface and corners are on tyres.' },
   trackOvertaking: { term: 'Overtaking difficulty', category: 'Racing', short: 'How hard it is to pass here. Street circuits are narrow and hard; long straights make it easy.' },
   teamPrincipal: { term: 'Team principal', category: 'Racing', short: "The boss of the team. That's you." },

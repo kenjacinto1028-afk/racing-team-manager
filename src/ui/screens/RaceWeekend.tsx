@@ -11,7 +11,7 @@ import { Tip } from '../components/Tip';
 import { TrackMap } from '../components/TrackMap';
 import { TeamBattle } from '../components/TeamBattle';
 import { useRaceLook } from '../raceLook';
-import { TrackProfile } from '../components/TrackProfile';
+import { TrackPreview } from '../components/TrackPreview';
 import { SetupPanel } from '../components/SetupPanel';
 import { unitAllowance } from '../../engine/car';
 import { FLAG, gapStr, lapTime, money, ordinal } from '../format';
@@ -68,9 +68,8 @@ function PreRace({ trackId, round, races }: { trackId: string; round: number; ra
       <div className="grid grid-2">
         <section className="card map-card"><TrackMap track={track} teams={g.teams} playerTeamId={team.id} /></section>
         <section className="card">
-          <h3>Track profile</h3>
-          <TrackProfile track={track} />
-          <p className="muted small">{track.profile.power > 0.65 ? 'Long straights: a strong engine pays off here.' : track.profile.downforce > 0.65 ? 'Twisty and tight: aero grip is king.' : 'A balanced circuit.'} {track.profile.tyreWear > 0.6 ? 'Hard on tyres, so expect stops to matter.' : ''} {track.profile.overtaking > 0.7 ? 'Passing is very hard: qualifying well is vital.' : ''}</p>
+          <h3>Track preview</h3>
+          <TrackPreview track={track} />
           <div className="race-cta">
             {short ? (
               <button className="btn btn-primary btn-lg" onClick={() => go('drivers')}>Sign a second driver first ›</button>
@@ -132,6 +131,10 @@ function Qualifying() {
       <div className="grid grid-2-1">
         <section className="card">
           <DataTable rows={weekend.qualifying} columns={cols} rowKey={(r) => r.driverId} rowClass={(r) => (r.teamId === team.id ? 'me' : undefined)} />
+        </section>
+        <section className="card">
+          <h3>Track preview</h3>
+          <TrackPreview track={track} />
         </section>
         <section className="card">
           <h3>Starting <Tip k="tyres">tyres</Tip></h3>
@@ -390,6 +393,7 @@ function Results() {
               <>
                 <h3>Next: {nextTrack.name}</h3>
                 <p className="muted small">Round {L.results.length + 1} · {nextTrack.country}. Upgrade the car or change staff first if you like.</p>
+                <TrackPreview track={nextTrack} compact />
                 <div className="btn-row">
                   <button className="btn" onClick={() => go('hq')}>Back to HQ</button>
                   <button className="btn btn-primary" onClick={() => { const r = prepare(); if (!r.ok) show(r.reason, 'bad'); }}>Qualifying ›</button>
