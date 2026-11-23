@@ -4,6 +4,15 @@ Add one entry at the end of each work session, newest first.
 
 ---
 
+## 2026-11-23: QoL Record book upgrade
+- A record book already existed (one best lap per track plus career records). Extended it rather than rebuilding.
+- Track records: top 20 fastest laps per track. Each driver counts once (their best lap) and each league keeps its own top 20, so slower leagues aren't buried by the top league. Pick a track from the menu or click its name.
+- League filter (All, FP, FC, FA, FR, FRk) on both the Record book and Track records tabs. Tables sort by clicking headers. Your team's rows are highlighted.
+- Save v8: old saves get the leaderboards seeded from the current lap records and this season's races (older seasons kept no lap times).
+- New tests for the leaderboard and the league filter; 128 tests pass. Browser check at 1280 px with a migrated v7 save, no console errors.
+- Not pushed yet: waiting for Kenneth.
+- **Next:** push (with OK), then the other plan items.
+
 ## 2026-11-20: QoL Live race screen upgrade
 - Mockups approved first (saved in project files: `screenshots/race-map-mockup*.png`, `timing-tower-laps-mockup.png`, `live-race-screen-mockup.png`).
 - Race map: number badge per car, clearly different team colours (look-alike colours swapped for a palette colour; your team keeps its own), wider road with two lanes so side-by-side cars show, bunched cars spread into rows of two, chequered start/finish line, pit lane outside the track with IN/OUT signs and team garages, sector lines, dashed rings on the 3 closest battles, YOU and P1 tags.

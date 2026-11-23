@@ -7,11 +7,11 @@ import { createRng, hashSeed } from '../engine/rng';
 import { initialSponsors } from '../engine/sponsors';
 import { defaultCarFields } from '../engine/car';
 import { defaultDevFields, refreshYouthPool } from '../engine/development';
-import { emptyRecords, updateRecords } from '../engine/records';
+import { addTopLap, emptyRecords, updateRecords } from '../engine/records';
 import type { GameState, TierId } from '../engine/types';
 
 /** Bump when the saved shape changes, and add a step to MIGRATIONS below. */
-export const SAVE_VERSION = 7;
+export const SAVE_VERSION = 8;
 
 type Save = Record<string, any>;
 
@@ -96,6 +96,17 @@ const MIGRATIONS: Record<number, (s: Save) => Save> = {
       for (const role of STAFF_ROLES) { const p = generateStaff(ctx, tier, role, ctx.rng.float(0.2, 0.9)); staff[p.id] = p; staffMarket.push(p.id); }
     }
     const game: GameState = { ...g, teams, drivers, staff, leagues, driverMarket, staffMarket, nextId: ctx.counter(), side: g.side ?? emptySide(g.season) };
+    return { ...s, game };
+  },
+  // v7 -> v8: top-20 lap leaderboards per track. Seed from the current record and this season's races.
+  7: (s) => {
+    const g = s.game as GameState | null;
+    if (!g) return s;
+    let game: GameState = { ...g, records: { ...(g.records ?? emptyRecords()), trackTop: {} } };
+    for (const e of Object.values(game.records.trackLaps)) {
+      game.records.trackTop![e.trackId] = addTopLap(game.records.trackTop![e.trackId], e);
+    }
+    for (const t of TIERS) for (const r of game.leagues[t]?.results ?? []) game = updateRecords(game, t, r).state;
     return { ...s, game };
   },
 };
