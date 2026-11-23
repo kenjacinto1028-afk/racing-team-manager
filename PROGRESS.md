@@ -1,7 +1,7 @@
 # Progress
 
 **Current phase:** QoL: live race screen upgrade is live. Next: visual effects (Kenneth to pick) and sound
-**Last updated:** 2026-11-20
+**Last updated:** 2026-11-23
 **Play:** https://kenjacinto1028-afk.github.io/racing-team-manager/
 
 Tick each box when it's done. Update "Current phase" and add an entry to `docs/SESSION_LOG.md` at the end of each session.
@@ -135,6 +135,7 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 - `node_modules` can't be installed inside `/mnt/project-files` (that folder blocks the links npm needs). Run `npm install` in a normal folder; the project's source is synced to `/mnt/project-files`.
 
 ## QoL updates
+- [x] Track preview before every race (corner types, tyre/stop/passing advice) on race weekend, qualifying and results screens
 - [x] Highlight your team's drivers and team in every ranking table (live timing tower, commentary, qualifying, results, standings, side series, calendar winners, records)
 - [x] Live race screen upgrade: bigger map with car numbers, clearly different team colours, wide two-lane road, chequered start/finish line, pit lane with garages, sector lines, battle rings; lap column in the timing list; live Team battle list; new layout
 - [x] Push the live race screen upgrade to the live game
