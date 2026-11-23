@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { TRACK_BY_ID } from '../../data/tracks';
 import { COMPOUNDS, wearPerLap } from '../../engine/performance';
 import { order, tyreLife, type RaceCar, type RaceState } from '../../engine/raceSim';
+import { BANKRUPT_STREAK, raceSalaries } from '../../engine/finance';
 import type { Compound, DriverMode, GameState, Team } from '../../engine/types';
 import { seasonOver, useGame, type RaceSpeed } from '../../store/gameStore';
 import { Pos, TeamName, useFlash } from '../components/bits';
@@ -53,6 +54,7 @@ function SeasonDone() {
 function PreRace({ trackId, round, races }: { trackId: string; round: number; races: number }) {
   const { g, team } = usePlayer();
   const prepare = useGame((s) => s.prepareRace);
+  const sim = useGame((s) => s.simNextRace);
   const [flash, show] = useFlash();
   const { go } = useNav();
   const track = TRACK_BY_ID[trackId];
@@ -75,7 +77,10 @@ function PreRace({ trackId, round, races }: { trackId: string; round: number; ra
             {short ? (
               <button className="btn btn-primary btn-lg" onClick={() => go('drivers')}>Sign a second driver first ›</button>
             ) : (
-              <button className="btn btn-primary btn-lg" onClick={() => { const r = prepare(); if (!r.ok) show(r.reason, 'bad'); }}>Run qualifying ›</button>
+              <>
+                <button className="btn btn-primary btn-lg" onClick={() => { const r = prepare(); if (!r.ok) show(r.reason, 'bad'); }}>Run qualifying ›</button>
+                <button className="btn btn-lg" title="Run qualifying and the whole race now, with no pit calls from you" onClick={() => { const r = sim(); if (!r.ok) show(r.reason, 'bad'); }}>Sim this race ⏭</button>
+              </>
             )}
           </div>
         </section>
@@ -218,7 +223,7 @@ function LiveRace({ race, g, team }: { race: RaceState; g: GameState; team: Team
               <div className="seg" title="Race speed: how fast the race plays">
                 {([1, 4, 16] as RaceSpeed[]).map((s) => <button key={s} className={speed === s ? 'on' : ''} onClick={() => setSpeed(s)}>{s}×</button>)}
               </div>
-              <button className="btn btn-sm" onClick={skip}><Tip k="skipRace" plain>Skip to end ⏭</Tip></button>
+              <button className="btn btn-sm" onClick={skip}><Tip k="skipRace" plain>Skip to my result ⏭</Tip></button>
             </>
           )}
           {race.finished && <button className="btn btn-primary btn-lg" onClick={() => finish()}>Results & payout ›</button>}
@@ -330,16 +335,40 @@ function PitWall({ car, race, position }: { car: RaceCar; race: RaceState; posit
   );
 }
 
+/** Plain-English line under each money item in the race debrief. */
+function financeNote(label: string): string {
+  if (label.startsWith('Sponsor payment')) return 'Your sponsors pay every race, more for a higher finish.';
+  if (label.startsWith('Points bonus')) return 'Extra cash for each point your team scored.';
+  if (label.startsWith('Salaries')) return 'Wages for your drivers and staff, paid after every race.';
+  if (label.startsWith('Driver win')) return 'Bonuses your drivers earn for wins and podiums.';
+  if (label.startsWith('Prize money')) return 'Prize money for your finishing place.';
+  if (label.startsWith('Pay driver')) return 'A pay driver brings their own sponsor money.';
+  if (label.startsWith('Youth academy')) return 'Running cost of your youth academy.';
+  if (label.startsWith('Sponsor bonus')) return 'Paid when a sponsor goal is met.';
+  if (label.startsWith('R&D')) return 'Money spent on a car upgrade.';
+  return '';
+}
+
 function Results() {
   const { g, team, tier, league } = usePlayer();
   const lastRace = useGame((s) => s.lastRace)!;
   const prepare = useGame((s) => s.prepareRace);
+  const sim = useGame((s) => s.simNextRace);
   const [flash, show] = useFlash();
   const { go } = useNav();
   const track = TRACK_BY_ID[lastRace.result.trackId];
   const res = lastRace.result;
   const over = seasonOver(g);
-  const lines = g.finance.ledger.filter((e) => e.season === lastRace.season && e.round === lastRace.round && /^(Sponsor|Points bonus|Salaries)/.test(e.label));
+  const roundLines = g.finance.ledger.filter((e) => e.season === lastRace.season && e.round === lastRace.round);
+  const moneyIn = roundLines.filter((e) => e.amount > 0).reduce((a, e) => a + e.amount, 0);
+  const moneyOut = roundLines.filter((e) => e.amount < 0).reduce((a, e) => a - e.amount, 0);
+  const net = lastRace.budgetAfter - lastRace.budgetBefore;
+  const perRace = raceSalaries(g, team.id);
+  const runway = perRace > 0 ? Math.floor(team.budget / perRace) : null;
+  let financeMsg: { kind: 'bad' | 'warn'; text: string } | null = null;
+  if (team.budget < 0) financeMsg = { kind: 'bad', text: `Budget is below zero. ${BANKRUPT_STREAK - g.finance.negativeStreak} more race(s) like this and the team goes bankrupt.` };
+  else if (net < 0) financeMsg = { kind: 'warn', text: `You spent more than you earned this race.${runway !== null ? ` At current salaries the budget lasts about ${runway} more race(s).` : ''}` };
+  else if (runway !== null && runway < 3) financeMsg = { kind: 'warn', text: `Budget covers only about ${runway} race(s) of salaries.` };
   const fastest = res.entries.filter((e) => !e.dnf && e.bestLap > 0).sort((a, b) => a.bestLap - b.bestLap)[0];
   const winner = res.entries[0];
   const L = g.leagues[tier];
@@ -371,13 +400,23 @@ function Results() {
           <DataTable rows={res.entries} columns={cols} rowKey={(r) => r.driverId} rowClass={(r) => (r.teamId === team.id ? 'me' : undefined)} />
         </section>
         <div className="stack">
-          <section className="card">
-            <h3>Payout</h3>
-            {lines.map((e, i) => (
-              <div className="list-row" key={i}><span>{e.label}</span><b className={e.amount >= 0 ? 'good' : 'bad'}>{money(e.amount, { sign: true })}</b></div>
+          <section className="card fin-notes">
+            <h3>Finance notes</h3>
+            {roundLines.length === 0 && <p className="muted small">No money moved this round.</p>}
+            {roundLines.map((e, i) => (
+              <div className="list-row fin-row" key={i}>
+                <span>
+                  {e.label}
+                  {financeNote(e.label) && <span className="fin-note">{financeNote(e.label)}</span>}
+                </span>
+                <b className={e.amount >= 0 ? 'good' : 'bad'}>{money(e.amount, { sign: true })}</b>
+              </div>
             ))}
-            <div className="list-row total"><span>Net</span><b className={lastRace.budgetAfter - lastRace.budgetBefore >= 0 ? 'good' : 'bad'}>{money(lastRace.budgetAfter - lastRace.budgetBefore, { sign: true })}</b></div>
+            <div className="list-row"><span>Money in</span><b className="good">{money(moneyIn, { sign: true })}</b></div>
+            <div className="list-row"><span>Money out</span><b className="bad">{money(-moneyOut, { sign: true })}</b></div>
+            <div className="list-row total"><span>Net</span><b className={net >= 0 ? 'good' : 'bad'}>{money(net, { sign: true })}</b></div>
             <div className="list-row"><span><Tip k="budget">Budget</Tip></span><b>{money(team.budget)}</b></div>
+            {financeMsg && <p className={'fin-msg ' + financeMsg.kind}>{financeMsg.text}</p>}
           </section>
           <section className="card">
             {over ? (
@@ -392,6 +431,7 @@ function Results() {
                 <p className="muted small">Round {L.results.length + 1} · {nextTrack.country}. Upgrade the car or change staff first if you like.</p>
                 <div className="btn-row">
                   <button className="btn" onClick={() => go('hq')}>Back to HQ</button>
+                  <button className="btn" title="Run the next race now, with no pit calls from you" onClick={() => { const r = sim(); if (!r.ok) show(r.reason, 'bad'); }}>Sim next race ⏭</button>
                   <button className="btn btn-primary" onClick={() => { const r = prepare(); if (!r.ok) show(r.reason, 'bad'); }}>Qualifying ›</button>
                 </div>
               </>

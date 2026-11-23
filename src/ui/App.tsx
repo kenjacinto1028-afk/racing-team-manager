@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { LEAGUES } from '../data/leagues';
 import { seasonOver, useGame } from '../store/gameStore';
 import { ConfirmButton } from './components/bits';
+import { SaveBackup } from './components/SaveBackup';
 import { Tip } from './components/Tip';
 import { Tutorial } from './components/Tutorial';
 import { TOUR_KEY } from '../data/tutorial';
@@ -58,16 +59,21 @@ function Shell() {
   const team = game.teams[game.playerTeamId];
   const over = seasonOver(game);
 
-  // Alt+← / Alt+→ move back and forward, like a browser.
+  // ← / → (or Alt+← / Alt+→) move back and forward, like a browser.
+  // Plain arrows stay off while typing, during the tutorial (it uses them) and while a dialog is open.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (!e.altKey) return;
-      if (e.key === 'ArrowLeft') { e.preventDefault(); back(); }
-      if (e.key === 'ArrowRight') { e.preventDefault(); forward(); }
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+      if (!e.altKey && (tour || document.querySelector('.overlay'))) return;
+      e.preventDefault();
+      if (e.key === 'ArrowLeft') back(); else forward();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [back, forward]);
+  }, [back, forward, tour]);
 
   // Team colours drive the accent across the whole app.
   useEffect(() => {
@@ -111,13 +117,14 @@ function Shell() {
           <div>Season {game.season} · {game.year}</div>
           <button className="btn btn-ghost btn-sm" onClick={() => setTour(true)}>Replay tutorial</button>
           <ConfirmButton className="btn btn-ghost btn-sm" confirmText="Erase save?" onConfirm={reset}>New game</ConfirmButton>
+          <SaveBackup compact />
         </div>
       </aside>
 
       <div className="main">
         <header className="topbar" data-tour="topbar">
-          <button className="nav-btn" onClick={back} disabled={!canBack} aria-label="Back" title="Back (Alt+←)">‹</button>
-          <button className="nav-btn" onClick={forward} disabled={!canForward} aria-label="Forward" title="Forward (Alt+→)">›</button>
+          <button className="nav-btn" onClick={back} disabled={!canBack} aria-label="Back" title="Back (← or Alt+←)">‹</button>
+          <button className="nav-btn" onClick={forward} disabled={!canForward} aria-label="Forward" title="Forward (→ or Alt+→)">›</button>
           <span className="crumb">{screen.label}{current === 'profile' && profile ? ` · ${profile.kind === 'driver' ? (game.drivers[profile.id] ? `${game.drivers[profile.id].firstName} ${game.drivers[profile.id].lastName}` : '') : profile.kind === 'staff' ? game.staff[profile.id]?.name ?? '' : game.teams[profile.id]?.name ?? ''}` : ''}</span>
           <span className="topbar-spacer" />
           <span className="pill"><Tip k="morale" plain>Morale</Tip> <b className={team.morale < 50 ? 'bad' : team.morale >= 80 ? 'good' : ''}>{team.morale}</b></span>

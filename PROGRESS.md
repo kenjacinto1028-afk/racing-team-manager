@@ -138,5 +138,11 @@ Tick each box when it's done. Update "Current phase" and add an entry to `docs/S
 - [x] Highlight your team's drivers and team in every ranking table (live timing tower, commentary, qualifying, results, standings, side series, calendar winners, records)
 - [x] Live race screen upgrade: bigger map with car numbers, clearly different team colours, wide two-lane road, chequered start/finish line, pit lane with garages, sector lines, battle rings; lap column in the timing list; live Team battle list; new layout
 - [x] Push the live race screen upgrade to the live game
+- [x] Sim buttons: "Sim to next race" (HQ, Results), "Sim this race" (pre-race), "Skip to my result" in the live race
+- [x] Save backup: download a save file and load it back (sidebar and New Game screen); old saves are upgraded on load
+- [x] Confirm dialog before releasing a driver or staff member (shows the settlement cost)
+- [x] Left and right arrow keys move back and forward (off while typing, in the tutorial, or with a dialog open)
+- [x] Finance notes in the race debrief: every money line explained, money in/out, runway warning
+- [ ] Commit and push (waiting for Kenneth's go-ahead)
 - [ ] Visual effects elsewhere (start lights, confetti, count-ups, etc.): waiting for Kenneth to pick
 - [ ] Sound: engine sound made in the browser, free CC0 effects, mute and volume control
