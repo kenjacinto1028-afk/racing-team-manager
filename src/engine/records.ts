@@ -5,14 +5,33 @@ import type { GameState, RaceRecords, RaceResult, RecordEntry, TierId } from './
 
 export interface RecordBreak { kind: 'lap' | 'youngest' | 'oldest' | 'margin'; label: string; detail: string; trackId: string; driverId: string; teamId: string }
 
-export const emptyRecords = (): RaceRecords => ({ trackLaps: {} });
+export const emptyRecords = (): RaceRecords => ({ trackLaps: {}, trackTop: {} });
+
+/** How many laps the leaderboard keeps for each track in each league. */
+export const TOP_LAPS = 20;
+
+/** Add a lap to a track's leaderboard: one lap per driver per league, top 20 per league, fastest first. */
+export function addTopLap(list: RecordEntry[] | undefined, e: RecordEntry): RecordEntry[] {
+  const cur = list ?? [];
+  const mine = cur.find((x) => x.driverId === e.driverId && x.tier === e.tier);
+  if (mine && mine.value <= e.value) return cur;
+  const rest = cur.filter((x) => x !== mine);
+  const sameTier = rest.filter((x) => x.tier === e.tier);
+  if (sameTier.length >= TOP_LAPS && sameTier.every((x) => x.value <= e.value)) return cur;
+  const merged = [...rest, e].sort((a, b) => a.value - b.value);
+  const seen: Partial<Record<TierId, number>> = {};
+  return merged.filter((x) => (seen[x.tier] = (seen[x.tier] ?? 0) + 1) <= TOP_LAPS);
+}
 
 /** Check a finished race against the all-time records. Returns the updated state and what fell. */
 export function updateRecords(state: GameState, tier: TierId, result: RaceResult): { state: GameState; broken: RecordBreak[] } {
-  const records: RaceRecords = { ...(state.records ?? emptyRecords()), trackLaps: { ...(state.records?.trackLaps ?? {}) } };
+  const records: RaceRecords = { ...(state.records ?? emptyRecords()), trackLaps: { ...(state.records?.trackLaps ?? {}) }, trackTop: { ...(state.records?.trackTop ?? {}) } };
   const broken: RecordBreak[] = [];
   const base = { season: state.season, year: state.year, tier, trackId: result.trackId };
 
+  for (const e of result.entries) {
+    if (e.bestLap > 0) records.trackTop![result.trackId] = addTopLap(records.trackTop![result.trackId], { ...base, driverId: e.driverId, teamId: e.teamId, value: e.bestLap });
+  }
   const fastest = result.entries.filter((e) => e.bestLap > 0).sort((a, b) => a.bestLap - b.bestLap)[0];
   if (fastest) {
     const cur = records.trackLaps[result.trackId];
@@ -50,7 +69,7 @@ export function updateRecords(state: GameState, tier: TierId, result: RaceResult
 export interface BookRow { id: string; title: string; holder: string | null; holderKind: 'driver' | 'team'; value: string; detail: string }
 
 /** Career records across every league and season (archive + live season). */
-export function recordBook(state: GameState): BookRow[] {
+export function recordBook(state: GameState, tier?: TierId): BookRow[] {
   const archives = [...state.history];
   if (!archives.some((h) => h.season === state.season) && Object.values(state.leagues).some((L) => L.results.length)) archives.push(liveArchive(state));
   const sum = new Map<string, { wins: number; podiums: number; points: number; races: number }>();
@@ -59,6 +78,7 @@ export function recordBook(state: GameState): BookRow[] {
   let bestSeason: { id: string; points: number; season: number; tier: TierId } | null = null;
   for (const h of archives) {
     for (const l of h.drivers) {
+      if (tier && l.tier !== tier) continue;
       const s = sum.get(l.driverId) ?? { wins: 0, podiums: 0, points: 0, races: 0 };
       s.wins += l.wins; s.podiums += l.podiums; s.points += l.points; s.races += l.races;
       sum.set(l.driverId, s);
@@ -67,8 +87,8 @@ export function recordBook(state: GameState): BookRow[] {
       }
     }
     if (state.history.includes(h)) {
-      for (const c of Object.values(h.champions)) if (c) titles.set(c, (titles.get(c) ?? 0) + 1);
-      for (const t of Object.values(h.tables)) if (t[0]) teamTitles.set(t[0].teamId, (teamTitles.get(t[0].teamId) ?? 0) + 1);
+      for (const [t, c] of Object.entries(h.champions)) if (c && (!tier || Number(t) === tier)) titles.set(c, (titles.get(c) ?? 0) + 1);
+      for (const [k, t] of Object.entries(h.tables)) if (t[0] && (!tier || Number(k) === tier)) teamTitles.set(t[0].teamId, (teamTitles.get(t[0].teamId) ?? 0) + 1);
     }
   }
   const top = <T,>(m: Map<string, T>, f: (v: T) => number) => [...m.entries()].sort((a, b) => f(b[1]) - f(a[1]) || (a[0] < b[0] ? -1 : 1))[0];
@@ -84,8 +104,10 @@ export function recordBook(state: GameState): BookRow[] {
   const bs = bestSeason as { id: string; points: number; season: number; tier: TierId } | null;
   rows.push({ id: 'season', title: 'Most points in a season', holder: bs?.id ?? null, holderKind: 'driver', value: bs ? `${bs.points}` : '-', detail: bs ? `Season ${bs.season}, ${LEAGUES[bs.tier]?.short ?? ''}` : '' });
   const r = state.records ?? emptyRecords();
-  const one = (id: string, title: string, e: RecordEntry | undefined, fmt: (v: number) => string) =>
+  const one = (id: string, title: string, e0: RecordEntry | undefined, fmt: (v: number) => string) => {
+    const e = e0 && (!tier || e0.tier === tier) ? e0 : undefined;
     rows.push({ id, title, holder: e?.driverId ?? null, holderKind: 'driver', value: e ? fmt(e.value) : '-', detail: e ? `Season ${e.season}, ${LEAGUES[e.tier]?.short ?? ''}` : '' });
+  };
   one('youngest', 'Youngest race winner', r.youngestWinner, (v) => `${v} yrs`);
   one('oldest', 'Oldest race winner', r.oldestWinner, (v) => `${v} yrs`);
   one('margin', 'Biggest winning margin', r.biggestMargin, (v) => `${v.toFixed(1)}s`);

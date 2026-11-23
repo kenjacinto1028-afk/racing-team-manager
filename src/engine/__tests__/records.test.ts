@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { FEATS } from '../../data/feats';
 import { checkRaceFeats, checkSeasonFeats } from '../feats';
 import { completeAllLeagues, runOffseason } from '../offseason';
-import { emptyRecords, recordBook, updateRecords } from '../records';
-import type { RaceResult } from '../types';
+import { addTopLap, emptyRecords, recordBook, TOP_LAPS, updateRecords } from '../records';
+import type { RaceResult, RecordEntry } from '../types';
 import { world } from './helpers';
 
 describe('records', () => {
@@ -74,5 +74,39 @@ describe('feats', () => {
     const out = checkSeasonFeats(state, { ...review, playerTierBefore: 3, playerTierAfter: 2, playerPosition: 1 });
     expect(out.unlocked).toEqual(expect.arrayContaining(['promoted', 'teamTitle']));
     expect(out.state.feats.promoted.season).toBe(review.season);
+  });
+});
+
+describe('top-20 lap leaderboards', () => {
+  it('a season fills each track with one lap per driver, fastest first', () => {
+    const s = completeAllLeagues(world(37));
+    for (const [trackId, list] of Object.entries(s.records.trackTop ?? {})) {
+      for (let i = 1; i < list.length; i++) expect(list[i].value).toBeGreaterThanOrEqual(list[i - 1].value);
+      expect(new Set(list.map((e) => e.driverId + e.tier)).size).toBe(list.length);
+      expect(list[0].value).toBeCloseTo(s.records.trackLaps[trackId].value);
+    }
+  });
+
+  it('keeps only 20 per league and a driver\'s best lap', () => {
+    const mk = (i: number, v: number, d = `d${i}`): RecordEntry => ({ driverId: d, teamId: 't', value: v, season: 1, year: 2030, tier: 3, trackId: 'x' });
+    let list: RecordEntry[] | undefined;
+    for (let i = 0; i < 25; i++) list = addTopLap(list, mk(i, 90 + i));
+    expect(list).toHaveLength(TOP_LAPS);
+    expect(list![19].value).toBe(109);
+    list = addTopLap(list, mk(99, 95, 'd10'));
+    expect(list!.find((e) => e.driverId === 'd10')!.value).toBe(95);
+    expect(list!).toHaveLength(TOP_LAPS);
+    list = addTopLap(list, mk(98, 200, 'd10'));
+    expect(list!.find((e) => e.driverId === 'd10')!.value).toBe(95);
+    // A different league keeps its own 20.
+    list = addTopLap(list, { ...mk(0, 300, 'z'), tier: 2 });
+    expect(list).toHaveLength(TOP_LAPS + 1);
+  });
+
+  it('the record book can be filtered by league', () => {
+    const s = runOffseason(world(38)).state;
+    const all = recordBook(s).find((r) => r.id === 'wins')!;
+    const t5 = recordBook(s, 5).find((r) => r.id === 'wins')!;
+    expect(Number(t5.value) || 0).toBeLessThanOrEqual(Number(all.value));
   });
 });

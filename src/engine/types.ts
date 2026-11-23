@@ -320,6 +320,8 @@ export interface RecordEntry {
 
 export interface RaceRecords {
   trackLaps: Record<string, RecordEntry>;
+  /** Top 20 fastest laps per track for each league (one lap per driver), fastest first. */
+  trackTop?: Record<string, RecordEntry[]>;
   youngestWinner?: RecordEntry;
   oldestWinner?: RecordEntry;
   biggestMargin?: RecordEntry;

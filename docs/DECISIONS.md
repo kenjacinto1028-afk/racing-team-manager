@@ -69,3 +69,6 @@ Record every design or technical decision here, newest first, so future sessions
 | 2026-11-19 | Live timing tower and 2D SVG track map | Exciting to watch without needing a game engine |
 | 2026-11-19 | Open-wheel tier ladder (3 tiers, 10 teams each) | Fits the promotion/relegation idea |
 | 2026-11-19 | Web browser platform | Easiest to build and share |
+
+## 2026-11-23: Track leaderboards keep one lap per driver, top 20 per league
+Top 20 per track per league (not overall), one best lap per driver. Reason: lower leagues are slower, so an overall top 20 would only show the top league. The "All" view shows the 20 fastest of the lot.
